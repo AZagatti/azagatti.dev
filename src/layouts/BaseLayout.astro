@@ -1,0 +1,22 @@
+---
+import BaseHead from '../components/BaseHead.astro'
+import { Footer } from '../components/footer'
+import { Header } from '../components/header'
+import { SITE_DESCRIPTION, SITE_TITLE } from '../consts'
+---
+
+<html lang="en">
+  <head>
+    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+  </head>
+
+  <body>
+    <div
+      class="w-full flex items-center justify-center flex-col dark:bg-gray-800"
+    >
+      <Header client:visible />
+      <slot />
+      <Footer />
+    </div>
+  </body>
+</html>

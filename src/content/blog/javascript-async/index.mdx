@@ -1,0 +1,235 @@
+---
+title: JavaScript assíncrono
+pubDate: '2022-02-23'
+description: 'Mais detalhes de como funcionam as funcionalidades assíncronas do JavaScript.'
+tags: [javascript, async, await, assincrono, callstack, eventloop, closure]
+keywords: [javascript, async, await, assincrono, callstack, eventloop, closure]
+heroImage: '/javascript-async.png'
+---
+
+## O básico
+
+Se você utiliza JavaScript a algum tempo provavelmente já utilizou conceitos
+assíncronos, desde os famosos `setTimeout`/`setInterval`, `Promise`, `async`/`await`
+e coisas do tipo.
+
+Primeiramente gostaria de destacar como o JavaScript funciona por debaixo dos
+panos, tornando mais fácil o entendimento do que seria essa assincronicidade.
+
+## Event Loop and Event Queue
+
+Para quem conhece JavaScript um pouco além do básico já deve ter ouvido falar na
+famosa arquitetura de Event Loop.
+
+O Event Loop nada mais é que uma forma cíclica de executar as ações que mandamos
+para o JavaScript, com isso o processo só é finalizando quando não existem mais
+eventos a serem executados ou por outros motivos, como um erro que quebra essa
+fila. Um exemplo de código para o Event Loop seria algo como:
+
+```js
+while (queue.waitForMessage()) {
+  queue.processNextMessage();
+}
+```
+
+Já a Event Queue nada mais é que a fila que gerência a ordem de execução dessas
+mensagens pelo Event Loop, ou seja, se tratando de uma fila, o primeiro evento 
+que é executado é o primeiro a chegar na fila, então como lidamos como uma fila
+e uma mensagem vai em seguida da outra chamamos de código síncrono, pois
+uma mensagem só será processada após a outra.
+
+![JavaScript Async](/event-loop.png)
+
+## Eventos assíncronos
+
+Bom, pelo que comentei antes os eventos acontecem todos sincronamente, então de
+que forma eram tratados os eventos assíncronos antes de termos API's de alto
+nível como `Promise` e `async`/`await`? Existem várias formas e uma delas é bem
+comum de utilizar no browser, que é o padrão `Observer`, no caso um `listener`
+fica "ouvindo" alterações de um determinado evento. Um exemplo é a antiga API para
+fazer requisições, o saudoso `XMLHttpRequest`:
+
+```js
+const xmlHttp = new XMLHttpRequest();
+xmlHttp.responseType = 'json';
+const url = 'https://api.github.com/users/azagatti';
+xmlHttp.onreadystatechange = () => {
+  // other implementations
+  console.log(xmlHttp.response);
+};
+xmlHttp.open('GET', url);
+xmlHttp.send(null);
+```
+
+Nesse caso registramos uma função na propriedade `onreadystatechange` da variável
+com a instância do `XMLHttpRequest` e então, quando usando o `send` recebemos o
+retorno desse dado no `response`, por isso toda a lógica de quando o dado for
+recebido deverá ficar dentro dessa função atribuída ao `onreadystatechange`.
+
+Um outro exemplo clássico de programação assíncrona é o `setTimeout`
+(e `setInterval`), onde a função atribuída é executada após o tempo informado,
+mas um exercício clássico sobre essa função, qual a ordem de execução desses
+logs? 🤔
+
+```js
+setTimeout(() => {
+  console.log('1');
+}, 0);
+console.log('2');
+```
+
+A ordem dos logs é: 2 -> 1. Isso por que o `setTimeout` entra na fila de eventos
+assíncronos, mesmo o tempo informado sendo 0, a Event Queue vai priorizar a
+execução dos dados síncronos, só então a função no `setTimeout` será executada.
+
+## Promise
+
+`Promise` é um conceito abrangente do que o próprio nome já diz, é uma promessa
+que deve ser aguardada. Como existem várias formas de se trabalhar com assíncrono,
+uma das mais conhecidas pelos usuários JavaScript é trabalhar com `callback`.
+Existem muitas formas também de se utilizar `callback`s, mas o padrão mais seguido
+no JavaScript é enviar uma função de sucesso e uma função de falha para um método
+assíncrono.
+
+```js
+function successCallback(result) {
+  console.log('It succeeded with ' + result);
+}
+
+function failureCallback(error) {
+  console.log('It failed with ' + error);
+}
+
+doSomething(successCallback, failureCallback);
+```
+
+Olhando assim pode parecer simples, mas quando existem eventos encadeados, que
+dependem da conclusão do anterior chegamos a um problema famoso, conhecido como
+`callback hell`.
+
+```js
+a((resultFromA) => {
+  b(resultFromA, (resultFromB) => {
+    c(resultFromB, (resultFromC) => {
+      d(resultFromC, (resultFromD) => {
+        e(resultFromD, (resultFromE) => {
+          f(resultFromE, (resultFromF) => {
+            console.log(resultFromF);
+          });
+        });
+      });
+    });
+  });
+});
+```
+
+Com a chegada da `Promise`, conseguimos trabalhar de forma mais elegante, ainda
+existe um encadeamento mas temos vantagens, como por exemplo, o `callback` passado
+anteriormente só será executado no fim do ciclo atual de execução do Event Loop,
+enquanto a `Promise` não depende disso. Para pegarmos o resultado de uma `Promise`
+devemos utilizar a `keyword` `then`.
+
+```js
+a().then((resultFromA) => {
+  return b(resultFromA)
+})
+.then((resultFromB) => {
+  return c(resultFromB)
+})
+.then((resultFromC) => {
+  return d(resultFromC)
+})
+.then((resultFromD) => {
+  return e(resultFromD)
+})
+.then((resultFromE) => {
+  return f(resultFromE)
+})
+.then((resultFromF) => {
+  console.log(resultFromF)
+})
+```
+
+Obviamente esses exemplos estão com muitos encadeamentos, o que não é tão comum,
+mas quando aparecer um caso em que é preciso muitos encadeamentos nem a `Promise`
+vai resolver, mas ao menos se torna mais legível e seguro de se utilizar.
+
+### O objeto Promise
+
+Acima mostrei como é utilizada uma `Promise`, mas para criá-la existem algumas
+formas e uma delas é utilizando o objeto global `Promise`, dentro desse objeto
+existem muitos métodos úteis para se trabalhar com `Promise`s, mas vou focar no
+básico.
+
+A `Promise` pode ser criada com a `keyword` `new`, onde passamos uma função que tem
+nos parâmetros duas funções, sendo elas, `resolve` e `reject`. O `resolve` retorna
+o dado passado se a `Promise` for concluída, já o `reject` retorna um erro dessa
+`Promise`.
+
+```js
+new Promise((resolve, reject) => {
+  resolve(console.log('Initial'));
+})
+.then(() => {
+  reject('Something failed');
+  console.log('Do this');
+})
+.catch(() => {
+  console.log('Do that');
+})
+.then(() => {
+  console.log('Do this whatever happened before');
+});
+```
+
+No log aparecerá: Initial -> Do that -> Do this whatever happened before.
+
+## Evoluindo com async e await
+
+Existem muitos casos em que utilizar o `then` para aguardar uma `Promise` começa
+a ficar complexo, criando várias `closures` em níveis diferentes, foi então que
+foi implementada no JavaScript a `feature` em que podemos criar uma `Promise`
+a partir de uma função comum, ao invés de utilizar o objeto global.
+
+Com as `keywords` `async` e `await` podemos trabalhar de forma imperativa
+com a programação assíncrona como  se fosse síncrona.
+
+```js
+async function getGithubData() {
+  return fetch('https://api.github.com/users/azagatti')
+}
+async function myPromise() {
+  const response = await getGithubData()
+  const data = await response.json()
+  return data
+}
+console.log(await myPromise())
+```
+
+Normalmente não seria possível utilizar o `await` em um escopo fora de uma função
+com `async`, mas recentemente entrou uma nova `feature` no `v8` (principal engine
+JavaScript), chamada [Top-level await](https://v8.dev/features/top-level-await),
+assim podemos utilizar `await` fora de funções `async` em versões mais
+atualizadas de browsers e servers que rodam com `v8`.
+
+Voltando ao foco, como no exemplo mostrado conseguimos aguardar operações assíncronas
+para então executar outros processos síncronos, geralmente ajuda a manter a
+legibilidade do código e manter um código limpo, criando novas variáveis e funções
+descritivas. Vale lembrar que sempre que adicionamos o prefixo `async` em uma
+função, ela automaticamente se torna uma `Promise`, ou seja, quando formos utilizar
+devemos utilizar o `then` ou `await`, ou então ela rodará e não teremos nenhum
+feedback, tem casos realmente que não são necessários.
+
+## Finalização
+
+Para finalizar, sempre utilize o `return` se for utilizar `then` dentro de uma
+função com `async`, ou então o compilador só irá ignorar e rodar em background,
+o que recomendo é escolher uma das abordagens para o caso, ou utiliza `async`
+junto com `await` ou `then`. Também Devo trazer outro artigo sobre os métodos que
+podemos usar com a `Promise` já que são muitos e tem muitas utilidades.
+
+### Referências:
+
+- [Modelo de Concorrência e Event Loop](https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/EventLoop)
+- [Usando promises](https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Guide/Using_promises)
+- [Async functions - making promises friendly](https://developers.google.com/web/fundamentals/getting-started/primers/async-functions)

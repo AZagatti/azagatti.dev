@@ -1,0 +1,95 @@
+---
+title: PubSub no React
+pubDate: '2021-04-24'
+description: 'PubSub Pattern, faz sentido utilizar no React?'
+tags: [javascript, js, react, react-native, pubsub, observer, pattern, padrão]
+keywords:
+  [javascript, js, react, react-native, pubsub, observer, pattern, padrão]
+heroImage: '/pubsub-react.png'
+---
+
+## Faz sentido aplicar esse pattern no React?
+
+Quem está habituado com React sabe que a forma que compartilhamos dados é por
+meio de gerenciadores de estado como Context, Redux e etc, então será que faz
+sentido utilizar esse tipo de padrão dentro das aplicações React? Minha resposta
+é sim, existem casos que os dados em si não precisam ser armazenados e outros
+casos que utilizar o gerenciador de estado acaba sendo desnecessário e complexo
+de algum serviço externo utilizá-lo.
+
+O meu caso de uso foi em um aplicativo React Native, que quando aberto inicializa
+o sistema de push notifications, eu precisava com que sempre que uma notificação
+específica chegasse um componente se estivesse aberto no momento fosse atualizado,
+ai entram os dois principais pontos que comentei, o dado seria utilizado uma vez
+e descartado e também seria complexo e desnecessário utilizar um gerenciador de
+estados para isso.
+
+Inicialmente fiz uma implementação no aplicativo utilizando
+uma biblioteca específica para isso chamada
+[pubsub-js](https://www.npmjs.com/package/pubsub-js), mas a implementação ficou
+tão útil e completa dentro do React que resolvi criar um pacote que implementa
+a biblioteca com os React hooks e foi ai que nasceu a
+[use-pubsub-js](https://www.npmjs.com/package/use-pubsub-js), além dos hooks
+também dá para utilizar a biblioteca original, sendo possível fazer publicações
+fora de componentes e esses componentes atualizarem.
+
+npm: https://www.npmjs.com/package/use-pubsub-js <br />
+Github: https://github.com/reactivando/use-pubsub-js
+
+## Quando utilizar?
+
+Agora apresentado o caso de uso que me fez desenvolver essa biblioteca, já vou
+começar com as vantagens e desvantagens de se utilizá-la.
+
+Vantagens:
+
+- Sem configurações complexas
+- Fácil utilização
+- Enviar dados e disparar funções entre componentes por toda a aplicação
+- Criado para aplicações React mas pode ser utilizado em arquivos que não são
+  componentes
+
+Desvantagens:
+
+- Persistir os dados pode ser um esforço desnecessário
+  (melhor utilizar gerenciador de estado)
+- Se não for bem definido, o fluxo de dados pode se tornar confuso
+
+Essas foram as principais vantagens e desvantagens que encontrei, podem haver outras
+em ambos os lados e recomendo que analise bem elas antes de utilizar no seu caso
+de uso, recomendo fortemente que teste
+[o exemplo do repositório](https://reactivando.github.io/use-pubsub-js/) e um
+[exemplo com alguns casos mais reais no Codesandbox](https://codesandbox.io/s/use-pubsub-ei2ly).
+
+Exemplo do Codesandbox:
+
+<iframe
+  src="https://codesandbox.io/embed/use-pubsub-ei2ly?fontsize=14&hidenavigation=1&theme=dark&view=preview"
+  style={{
+    width: '100%',
+    height: 500,
+    border: 0,
+    borderRadius: 4,
+    overflow: 'hidden',
+  }}
+  title="use-pubsub"
+  allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
+  sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
+></iframe>
+
+## Conclusão
+
+Não vou me extender mais sobre, recomendo que dê uma olhada na
+[documentação do repositório](https://github.com/reactivando/use-pubsub-js)
+ou no [npm](https://www.npmjs.com/package/use-pubsub-js), teste os exemplos e
+veja se faz sentido utilizar pro seu caso de uso, qualquer dúvida também manda
+nos comentários que posso tentar ajudar se faz sentido utilizar. No geral vejo
+muita utilidade para esse pacote, cobriu perfeitamente o caso de uso que eu
+tinha e pretendo utilizar mais vezes.
+
+## Referências
+
+- [PubSub](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern)
+- [Observer](https://refactoring.guru/pt-br/design-patterns/observer)
+- [use-pubsub-js repositório](https://github.com/reactivando/use-pubsub-js)
+- [use-pubsub-js npm](https://www.npmjs.com/package/use-pubsub-js)

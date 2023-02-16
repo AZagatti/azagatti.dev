@@ -1,0 +1,459 @@
+---
+title: Testes no Frontend
+pubDate: '2020-11-10'
+description: 'Como criar testes no frontend e sua importancia'
+tags: [html, css, javascript, js, react, react-native, testing-library, enzyme]
+keywords:
+  [html, css, javascript, js, react, react-native, testing-library, enzyme]
+heroImage: '/frontend-test.png'
+---
+
+## Por quê criar testes?
+
+A primeira pergunta que deve vir na mente de todo desenvolvedor, por que criar testes?
+Se tratando de frontend então, o que mais se deve ouvir é: "Pra que criar testes
+se a equipe pode testar?"
+
+Os testes automatizatos necessitam sim de um esforço a mais quando se trata de
+desenvolver um software, mas o que muitas pessoas acabam não percebendo é que
+esse esforço na verdade pode economizar mais esforço e até dinheiro no futuro.
+
+Como podemos ter tanta certeza que uma mudança X não vai quebrar features que já
+estavam funcionando? Para isso existem muitos tipos de testes, nesse artigo vou
+comentar sobre testes unitários e mostrar como testar sua aplicação React.
+
+## Evite testes de detalhes da implementação!
+
+Se tratando do React é muito comum as pessoas associarem os testes de componentes
+a library `Enzyme`. Realmente é uma boa biblioteca que ajudou muitos devs a testarem
+suas aplicações em React, mas com o tempo surgiram muitas controvérsias na comunidade
+sobre os falsos positivos e falsos negativos que essa abordagem de teste proporciona.
+
+Como o objetivo é testar direto o detalhe da implementação, quando acontece uma
+refatoração no código os testes podem acabar falhando, gerando um falso negativo.
+No caso dos falsos positivos, eles podem aparecer quando não é testado todo o
+detalhe, passando bugs pelos testes.
+
+Se quiser mais informações e exemplos recomendo
+[esse artigo](https://kentcdodds.com/blog/testing-implementation-details) do Kent C. Dodds.
+
+## Tooling
+
+Vou comentar rapidamente do tooling de testes recomendado hoje pro React quando se
+fala em testes unitários.
+
+[Jest](https://jestjs.io/) é um framework completo de testes pro JavaScript, podendo
+ser utilizado para testar frontend web, backend, mobile e várias plataformas que
+usam JS.
+
+[Testing Library](https://testing-library.com/) é uma biblioteca com utilitários
+para criar testes de comportamento(behavior) focado em boas práticas. No exemplo
+vou mostrar a utilização dela no React, mas existem versões pra JS Vanilla, Vue,
+React Native e outros...
+
+## Criando a estrutura
+
+Nesse post vou utilizar o React, caso não conheça dê uma olhada
+[nesse meu outro post](https://blog.azagatti.dev/pillars-react/).
+Também vou utilizar a nova API de Hooks do React, caso não tenha familiaridade
+com essa API leia [este post](https://blog.azagatti.dev/migrate-to-hooks/) aqui.
+
+De início vou criar uma estrutura simples de roteamento com o `react-router-dom`
+
+```tsx
+import React from 'react'
+import { Switch, Route } from 'react-router-dom'
+
+import Home from './pages/Home'
+import List from './pages/List'
+
+const Routes = () => (
+  <Switch>
+    <Route path="/" exact component={Home} />
+    <Route path="/list" component={List} />
+  </Switch>
+)
+
+export default Routes
+```
+
+Com o arquivo de roteamento criado, só preciso chamá-lo no `App.tsx` que é o
+primeiro componente da aplicação.
+
+```tsx
+import React from 'react'
+import { BrowserRouter } from 'react-router-dom'
+
+import Routes from './routes'
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes />
+    </BrowserRouter>
+  )
+}
+```
+
+Agora vou passar rapidamente pelas duas telas que criei e explico o
+funcionamento de cada uma.
+
+```tsx
+import React, { FormEvent, useCallback, useState } from 'react'
+import { useHistory } from 'react-router-dom'
+
+const Home = () => {
+  const [name, setName] = useState('')
+  const history = useHistory()
+
+  const handleSubmit = useCallback(
+    (e: FormEvent) => {
+      e.preventDefault()
+      if (name) {
+        history.push('/list', { name })
+      }
+    },
+    [history, name]
+  )
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <label>
+        <div>User</div>
+        <input
+          placeholder="User"
+          value={name}
+          onChange={({ target }) => setName(target.value)}
+        />
+      </label>
+      <button type="submit">Ver repos</button>
+    </form>
+  )
+}
+
+export default Home
+```
+
+Essa é a tela inicial, contém somente um input e tem a responsabilidade de
+enviar o valor digitado pelo usuário para a tela que vai listar os repositórios do
+Github do nome inserido.
+
+```tsx
+import React, { useEffect, useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
+import axios from 'axios'
+
+interface IRepo {
+  id: number
+  name: string
+  description: string | null
+  url: string
+  stargazers_count: number
+  forks: number
+  open_issues: number
+}
+
+const List = () => {
+  const { state } = useLocation<{ name: string } | undefined>()
+
+  const [repos, setRepos] = useState<IRepo[]>([])
+
+  useEffect(() => {
+    ;(async () => {
+      try {
+        const { data } = await axios.get(
+          `https://api.github.com/users/${state?.name}/repos`
+        )
+        setRepos(data)
+      } catch (err) {
+        console.error(err)
+      }
+    })()
+  }, [state?.name])
+
+  return (
+    <div>
+      <Link to="/">Voltar</Link>
+      <ul>
+        {repos.map((repo) => (
+          <li key={repo.id}>
+            <p>{repo.name}</p>
+            {repo?.description ? <p>{repo.description}</p> : null}
+            <div>
+              <a href={repo.url} target="_blank" rel="noreferrer noopener">
+                Link
+              </a>
+            </div>
+            <span>Stars: {repo.stargazers_count}</span> <span>
+              Forks: {repo.forks}
+            </span> <span>Issues: {repo.open_issues}</span>{' '}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+export default List
+```
+
+Essa tela tem a responsabilidade de buscar os repositórios do usuário utilizando
+a API do Github e lista-los.
+
+## Testando
+
+Agora vamos para a parte que importa do post, criar os primeiros testes.
+
+Para criar o arquivo de testes podemos utilizar a extensão `File.test.tsx` ou
+`File.spec.tsx`, no caso o final dá extensão é o mesmo do seu arquivo, em testes
+unitários costumo utilizar com `spec`.
+
+Nesse primeiro teste já posso explicar o por que ter criado o roteamento entre
+páginas para esse exemplo, foi para mostrar como fazer o
+[mock](https://pt.wikipedia.org/wiki/Objeto_mock) de bibliotecas.
+
+Para começar o teste normalmente utilizamos o `describe` para informar uma suíte
+de testes, ou seja, um bloco que vai testar de várias formas uma mesma função,
+objeto ou componente. Dentro desse `describe` temos várias síntaxes para criar os
+testes, a que eu mais utilizo e grande parte da comunidade também é o `it` que
+poderia ser substituído pelo `test`, mas quando escrevemos o que deve acontecer
+no teste o `it` se torna mais semântico, como nesse exemplo:
+"Deve ir para a página List".
+
+```tsx
+describe('Home', () => {
+  it('should go to List Page', () => {
+    // implementation
+  })
+})
+```
+
+Depois de criada a estrutura do teste que é a síntaxe do Jest, utilizamos da
+testing-library a função `render` para renderizar nosso componente que será testado.
+Com o componente dentro do `render` podemos usar a
+[desestruturação](https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Operators/Atribuicao_via_desestruturacao)
+e pegar as funções `getByPlaceholderText` e `getByText` que são utilizadas para
+selecionar elementos que foram renderizados do componente na função `render`.
+
+```tsx
+import React from 'react'
+import { render } from '@testing-library/react'
+
+import Home from './Home'
+
+describe('Home', () => {
+  it('should go to List page', () => {
+    const { getByPlaceholderText, getByText } = render(<Home />)
+
+    // implementation
+  })
+})
+```
+
+Para disparar eventos do DOM no teste, importamos a função `fireEvent` também da
+testing-library e utilizamos o evento `change` para alterar o valor do input,
+temos que seguir a estrutura do evento, por isso é um objeto com uma chave target,
+que é outro objeto com a chave value e o valor do input. Também com o `fireEvent` disparamos um `click` no botão que seria o comportamento
+de ir para a página List com o valor que foi digitado no input.
+
+```tsx
+import React from 'react'
+import { render, fireEvent } from '@testing-library/react'
+
+import Home from './Home'
+
+describe('Home', () => {
+  it('should go to List page', () => {
+    const { getByPlaceholderText, getByText } = render(<Home />)
+
+    fireEvent.change(getByPlaceholderText('User'), {
+      target: { value: 'azagatti' },
+    })
+    fireEvent.click(getByText('Ver repos'))
+  })
+})
+```
+
+Para saber se o teste passou ou não adicionamos o `expect`, dentro dele como
+primeiro parâmetro adicionamos um valor qualquer que será comparado com o
+`Matcher`, que é a função encadeada do `expect`. No primeiro `expect` é esperado
+que o input com o placeholder `User` tenha o valor que passei no evento, no caso
+`azagatti`.
+
+```tsx
+import React from 'react'
+import { render, fireEvent } from '@testing-library/react'
+
+import Home from './Home'
+
+describe('Home', () => {
+  it('should go to List page', () => {
+    const { getByPlaceholderText, getByText } = render(<Home />)
+
+    fireEvent.change(getByPlaceholderText('User'), {
+      target: { value: 'azagatti' },
+    })
+    fireEvent.click(getByText('Ver repos'))
+
+    expect(getByPlaceholderText('User')).toHaveDisplayValue('azagatti')
+  })
+})
+```
+
+O teste parece pronto, mas aparecerá um erro se rodar, se analisarmos bem a
+página está sendo renderizada fora das rotas e utiliza um hook e um método desse
+hook para ir para outra página e é ai que entra o mock.
+
+Existem várias formas de mockar com o `Jest`. Para bibliotecas acho mais fácil
+utilizar uma função `mock` que é chamada com a própria variável global `jest`.
+Como primeiro parâmetro é passado o nome do módulo(biblioteca) que vai ser mockada
+e em seguida o que essa biblioteca vai retornar. A biblioteca `react-router-dom`
+em si retorna muitas coisas, mas o que me interessa que é utilizado na página é
+o hook `useHistory` então só preciso mockar a implementação dele.
+
+Eu sei que o `useHistory` é uma função que retorna um objeto que tem várias funções
+e novamente só preciso mockar o que eu utilizo, no caso a função `push`. Para
+mockar uma função podemos adicionar somente uma função vazia(() => {}) ou se
+quisermos monitorar ela, podemos criar uma variável com `jest.fn()` e passar para a
+função que quero monitorar. Como tenho acesso a função que deve ser utilizada no
+clique do botão, posso adicionar outro `expect` e o `Matcher` como `toBeCalled`
+que verifica se a função do parâmetro do `expect` foi chamada.
+
+```tsx
+import React from 'react'
+import { render, fireEvent } from '@testing-library/react'
+
+import Home from './Home'
+
+const mockedHistoryPush = jest.fn()
+
+jest.mock('react-router-dom', () => {
+  return {
+    useHistory: () => ({
+      push: mockedHistoryPush,
+    }),
+  }
+})
+
+describe('Home', () => {
+  it('should go to List page', () => {
+    const { getByPlaceholderText, getByText } = render(<Home />)
+
+    fireEvent.change(getByPlaceholderText('User'), {
+      target: { value: 'azagatti' },
+    })
+    fireEvent.click(getByText('Ver repos'))
+
+    expect(getByPlaceholderText('User')).toHaveDisplayValue('azagatti')
+    expect(mockedHistoryPush).toBeCalled()
+  })
+})
+```
+
+Esse é um teste simples mas com ele consegui explicar grande dos conceitos
+utilizados para criar testes no React.
+
+Com a maioria dos conceitos já explicados, no teste da página `List` vou focar nos
+novos conceitos.
+
+```tsx
+import React from 'react'
+import { render, waitFor } from '@testing-library/react'
+import axios from 'axios'
+import MockAdapter from 'axios-mock-adapter'
+
+import List from './List'
+
+const apiMock = new MockAdapter(axios)
+
+const mocksRepos = [
+  {
+    id: 1,
+    name: 'Repo01',
+    description: 'Description01',
+    url: 'about:blank',
+    stargazers_count: '1',
+    forks: '2',
+    open_issues: '3',
+  },
+  {
+    id: 2,
+    name: 'Repo02',
+    description: 'Description02',
+    url: 'about:blank',
+    stargazers_count: '4',
+    forks: '5',
+    open_issues: '6',
+  },
+]
+
+jest.mock('react-router-dom', () => {
+  return {
+    useLocation: () => ({
+      pathname: '/list',
+      state: { name: 'azagatti' },
+    }),
+    Link: ({ children }: { children: React.ReactNode }) => children,
+  }
+})
+
+describe('List', () => {
+  it('should load repos', async () => {
+    apiMock
+      .onGet('https://api.github.com/users/azagatti/repos')
+      .reply(200, mocksRepos)
+    const { getByText } = render(<List />)
+
+    await waitFor(() => {
+      expect(getByText('Repo01')).toBeInTheDocument()
+      expect(getByText('Repo02')).toBeInTheDocument()
+    })
+  })
+})
+```
+
+Outra biblioteca? axios-mock-adapter? Sim, ela é utilizada para facilitar a
+criação de mocks com o `axios`, caso esteja utilizando fetch existe
+[esse pacote](https://www.npmjs.com/package/fetch-mock) e muitos outros.
+[Onde trabalho](https://www.linkedin.com/company/zedelivery/) utilizamos
+[GraphQL](https://graphql.org/) com a biblioteca
+[Apollo Client](https://www.apollographql.com/docs/) e a própria biblioteca
+fornece uma forma de
+[mockar as chamadas.](https://www.apollographql.com/docs/react/development-testing/testing/#an-introduction)
+
+Nesse teste é mockada novamente a biblioteca `react-router-dom`, mas dessa vez o
+que é utilizado na página é o hook `useLocation` e o componente `Link`. Novamente
+o hook é uma função e dela eu quero que venha o state que seria enviado pela página
+Home. O componente `Link` utiliza o children como o texto ou elemento que é
+exibido, então crio uma função que retorna somente esse texto, sem implementação.
+
+A parte de mock da API é algo que pode ser encontrado na documentação de cada
+ferramente, no caso da `axios-mock-adapter` preciso criar uma variável que recebe
+a classe da biblioteca e como parâmetro dessa classe a instância do axios. Com a
+variável posso especificar a rota e o retorno dela, nesse teste retornei o status
+200 e o array mockRepos declarado em cima com o mesmo formato utilizado na página.
+
+Na parte do `expect` utilizei uma função da `testing-library` para aguardar até o
+elemento com o texto que informei estar no DOM. Como a chamada para a API é algo
+assíncrono, se não utilizar a função `waitFor` ocorrerá um erro, porque no momento
+do primeiro render do componente esses textos ainda não estarão em tela.
+
+Repositório com o código: https://github.com/AZagatti/post-tests
+
+## Conclusão
+
+No começo criar testes pode atrasar o desenvolvimento e não mostrar explicitamente
+a vantagem da criação desses testes, mas com o crescimento da aplicação ou sendo
+uma aplicação pequena mas muito importante, é essencial ter essa confiança de
+desenvolver sabendo que o código novo não vai afetar a funcionalidade do antigo e
+abranger várias situações que podem acontecer com o componente.
+
+A minha opinião é sempre que tiver visão de crescimento ou importância para a
+aplicação criar testes. É um hábito que vai se tornando mais familiar e comum
+com a prática. Recomendo de verdade estudar mais sobre o assunto.
+
+### Recomendação de conteúdos
+
+Kent C. Dodds: https://kentcdodds.com/blog/write-tests
+
+Robin Wieruch: https://www.robinwieruch.de/react-testing-library

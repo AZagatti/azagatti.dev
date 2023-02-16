@@ -1,0 +1,333 @@
+---
+title: Do React web pro native
+pubDate: '2021-01-13'
+description: 'Mostrando as diferenças entre o React na web e no native do mundo mobile'
+tags: [javascript, react, react native, web, mobile, ios, android]
+keywords: [javascript, react, react native, web, mobile, ios, android]
+heroImage: '/react-web-to-native.png'
+---
+
+## Introdução
+
+Esse post tem o intuito de explicar algumas diferenças entre o mundo de
+desenvolvimento web e mobile com React.
+
+Quando falamos em React a primeira coisa que vem na cabeça na maioria das pessoas
+é o React no mundo web, mas na verdade a biblioteca React é apenas para criação
+de interfaces não necessariamente só para web, pode ser usada para criar interfaces
+para celulares, Windows e até mais recentemente para Mac.
+
+## Similaridades
+
+Ambos utilizam o React, então conceitos como `props`, `state`, `component`, 
+`lifecycle` e `hooks` se mantém não importa em qual plataforma. Também podemos
+utilizar bibliotecas que não utilizam coisas específicas do browser, como por
+exemplo gerenciadores de estado.
+
+```tsx
+import React, { useState, useEffect } from 'react'
+
+const App: React.FC = (props) => {
+  const [state, setState] = useState('')
+
+  useEffect(() => {}, [])
+
+  return (
+    // UI
+  )
+}
+```
+
+Como em ambos utilizamos JSX o componente acima é válido tanto no React web, quanto
+no React Native.
+
+## Diferenças
+
+### Elementos
+
+Quando programamos para o React na web utilizamos as tags do HTML, como `<div>`,
+`<p>`, `<input>` e outras tags. No React Native precisamos utilizar componentes
+nativos como `<View>`, `<Text>`, `<TextInput>` e
+[outros componentes](https://reactnative.dev/docs/components-and-apis).
+
+Web:
+
+```tsx
+import React, { useState, useEffect } from 'react';
+
+const App: React.FC = (props) => {
+  const [state, setState] = useState('');
+
+  useEffect(() => {}, []);
+
+  return (
+    <div>
+      <h1>Hello World</h1>
+    </div>
+  );
+};
+```
+
+Native:
+
+```tsx
+import React, { useState, useEffect } from 'react';
+import { View, Text } from 'react-native';
+
+const App: React.FC = (props) => {
+  const [state, setState] = useState('');
+
+  useEffect(() => {}, []);
+
+  return (
+    <View>
+      <Text>Hello World</Text>
+    </View>
+  );
+};
+```
+
+Obs: Todo texto no React Native deve estar dentro do componente `Text`.
+
+### Estilos
+
+Quando falamos de estilo dá aplicação logo vem na mente `css` e sim o React Native
+também utiliza o `css` para estilizar a aplicação com algumas propriedades a menos
+e algumas específicas também. Outra grande diferença na estilização no React Native
+é que utilizamos uma classe exportada pelo próprio pacote para criar os estilos.
+
+Web:
+
+```css
+.main {
+  margin-top: 10px;
+  color: #fff;
+  background-color: #0a0a0a;
+}
+```
+
+```tsx
+import React from 'react';
+
+import './styles.css';
+
+const App: React.FC = () => {
+  return (
+    <div className="main">
+      <h1>Hello World</h1>
+    </div>
+  );
+};
+```
+
+Native:
+
+```ts
+import { StyleSheet } from 'react-native';
+
+const styles = StyleSheet.create({
+  main: {
+    marginTop: 10,
+    backgroundColor: '#0a0a0a',
+  },
+  text: {
+    color: '#fff',
+  },
+});
+```
+
+```tsx
+import React from 'react';
+import { View, Text } from 'react-native';
+
+import styles from './styles.ts';
+
+const App: React.FC = () => {
+  return (
+    <View style={styles.main}>
+      <Text style={styles.text}>Hello World</Text>
+    </View>
+  );
+};
+```
+
+Com esses exemplos podemos analisar melhor. Enquanto na web utilizamos o `css`
+em seu modo tradicional, no React Native ele é criado dentro de um objeto, então
+utilizamos números ao invés de valor com `px` e as propriedades ficam em camelCase.
+Outa observação legal de se citar é que enquanto na web temos a herança de estilo
+do elemento pai para filho no React Native isso não existe, então para atribuir
+uma cor direto para o texto temos que criar uma nova chave com esse atributo.
+
+Lembrando que para padronizar a estilização entre plataformas podemos utilizar
+bibliotecas de `CSS in JS` como o
+[emotion](https://emotion.sh/docs/introduction) e
+[styled-components](https://styled-components.com/).
+
+### Rotas e navegação
+
+Esse é um tópico mais complexo de explicar, pois existem alguns pacotes mais
+utilizados para criar rotas em ambas as plataformas e alguns outros que algumas
+pessoas preferem, vou então explicar se baseando no que utilizo e vejo a comunidade
+utilizar.
+
+Na web o pacote mais famoso de rotas hoje pro React é o
+[react-router-dom](https://reactrouter.com/web/guides/quick-start),
+enquanto que no React Native o pacote mais famoso é o
+[react-navigation](https://reactnavigation.org/).
+
+Roteamento na web com react-router-dom:
+
+```tsx
+import React from 'react';
+import { BrowserRouter, Switch, Route, Link } from 'react-router-dom';
+
+const About: React.FC = () => <h1>About</h1>;
+
+const Home: React.FC = () => <h1>Home</h1>;
+
+const App: React.FC = () => (
+  <BrowserRouter>
+    <nav>
+      <ul>
+        <li>
+          <Link to="/">Home</Link>
+        </li>
+        <li>
+          <Link to="/about">About</Link>
+        </li>
+      </ul>
+    </nav>
+    <Switch>
+      <Route path="/about">
+        <About />
+      </Route>
+      <Route path="/">
+        <Home />
+      </Route>
+    </Switch>
+  </BrowserRouter>
+);
+```
+
+Roteamento no React Native com react-navigation:
+
+```tsx
+import 'react-native-gesture-handler';
+import React from 'react';
+import { View, Text } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+
+const HomeScreen: React.FC = () => (
+  <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+    <Text>Home Screen</Text>
+  </View>
+);
+
+const Stack = createStackNavigator();
+
+const App: React.FC = () => (
+  <NavigationContainer>
+    <Stack.Navigator>
+      <Stack.Screen name="Home" component={HomeScreen} />
+    </Stack.Navigator>
+  </NavigationContainer>
+);
+```
+
+### Códigos específicos para cada plataforma
+
+Como é de se esperar existem coisas específicas de cada plataforma que nos
+obrigam a estudar mais profudamente a plataforma além da tecnologia do framework.
+Como no browser temos que nos preocupar com bundle final do projeto, SEO e temos
+disponíveis API's como `windows`, `localStorage`, `DOM`, `WebRTC` e muitas outras,
+no mundo do desenvolvimento nativo também existem coisas específicas como uma
+classe chamada `Platform` que informa qual a plataforma está rodando o aplicativo,
+`Animated` para criar animações, `Dimensions` para informar tamanhos da tela e
+outras peculiaridades.
+
+Um exemplo interessante de deixar registrado nesse post é que o React Native já
+fornece uma lista virtualizada que ajuda muito na renderização de vários elementos
+quando falamos em performance.
+
+Na web podemos mostrar valores de uma lista com um map:
+
+```tsx
+import React from 'react';
+
+const users = [
+  { id: 0, name: 'André Zagatti', age: 23 },
+  { id: 1, name: 'John Doe', age: 26 },
+  { id: 2, name: 'Fulano', age: 31 },
+  { id: 3, name: 'Ciclano', age: 43 },
+];
+
+interface ItemListProps {
+  name: string;
+  age: number;
+}
+
+const ListItem: React.FC<ItemListProps> = ({ name, age }: ItemListProps) => (
+  <li>
+    <p>{name}</p>
+    <p>{age}</p>
+  </li>
+);
+
+const App: React.FC = () => (
+  <ul>
+    {users.map((user) => (
+      <ListItem key={user.id} name={user.name} age={user.age} />
+    ))}
+  </ul>
+);
+```
+
+No React Native temos um componente de lista virtualizada no próprio pacote:
+
+```tsx
+import React, { useState, useEffect } from 'react';
+import { View, Text, FlatList } from 'react-native';
+
+const users = [
+  { id: 0, name: 'André Zagatti', age: 23 },
+  { id: 1, name: 'John Doe', age: 26 },
+  { id: 2, name: 'Fulano', age: 31 },
+  { id: 3, name: 'Ciclano', age: 43 },
+];
+
+interface ItemListProps {
+  name: string;
+  age: number;
+}
+
+const ListItem: React.FC<ItemListProps> = ({ name, age }: ItemListProps) => (
+  <View>
+    <Text>{name}</Text>
+    <Text>{age}</Text>
+  </View>
+);
+
+const App: React.FC = () => (
+  <FlatList
+    data={users}
+    keyExtractor={(user) => user.id}
+    renderItem={({ item: user }) => (
+      <ListItem name={user.name} age={user.age} />
+    )}
+  />
+);
+```
+
+## Conclusão
+
+Realmente é possível utilizar o conhecimento criado codando em uma das duas
+plataformas para fazer projetos para a outra. Digo por experiência própria que
+dá para trabalhar em ambos os campos e conseguir desenvolver aplicativos e sites
+sensacionais.
+
+Mas uma coisa que posso dizer é que ser especialista em tudo que existe nas duas
+plataformas é bem difícil e leva tempo, até hoje aparecem coisas que me
+surpreendem e tenho que ir atrás de respostas, principalmente no mundo do React
+Native que é bem delicado por se tratar de códigos nativos diferentes em mais de
+uma plataforma e empresas diferentes no mundo mobile(Apple e Google).

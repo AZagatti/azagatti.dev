@@ -1,0 +1,186 @@
+---
+title: Atribuição por valor e referência
+pubDate: '2021-07-16'
+description: 'Por que devemos tomar cuidado ao reatribuir dados a valores não primitivos.'
+tags:
+  [
+    javascript,
+    variable,
+    variavel,
+    atribuicao,
+    value,
+    valor,
+    reference,
+    referencia,
+  ]
+keywords:
+  [
+    javascript,
+    variable,
+    variavel,
+    atribuicao,
+    value,
+    valor,
+    reference,
+    referencia,
+  ]
+heroImage: '/assignment-value-and-reference.png'
+---
+
+![Value and Reference](banner.png)
+
+---
+
+## Tipos de dados
+
+Quando atribuimos um valor a uma variável ele pode ser um valor primitivo ou uma
+estrutura de dados.
+
+#### Valores primitivos
+
+Os valores primitivos no JavaScript são: `String`, `Number`, `Boolean`, `Null`
+(primitivo especial), `undefined`
+e `Symbol`. Esses valores são imutáveis, então quando alteramos alguma variável com
+algum desses dados é criado uma nova referência em memória, o mesmo acontece quando
+atribuímos uma variável a outra.
+
+```js
+let value = 'Zagatti'
+let newValue = value
+```
+
+No exemplo acima as duas variáveis são iguais, pois ambas contém um tipo primitivo
+que pode ser comparado dentro do JavaScript, mas se alterarmos alguma delas essa
+alteração não será refletida na outra.
+
+Isso é o que podemos chamar de atribuição por valor, pois as variáveis não compartilham
+a mesma referência, sendo independentes.
+
+#### Valores não primitivos
+
+No JavaScript podemos dizer que os valores não primitivos englobam o tipo
+[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)
+e
+[Function](https://developer.mozilla.org/en-US/docs/Glossary/Function),
+que no caso do JavaScript arrays, objetos literais, Map e etc, são do tipo Object.
+
+```js
+const reference = { name: 'Zagatti' }
+const newReference = { name: 'Zagatti' }
+
+console.log(reference === newReference) // false
+```
+
+Se utilizarmos o operador de comparação entre objetos iguais temos um `false`
+como resultado, pois são objetos diferentes, contém as mesmas informações mas
+tem referências diferentes.
+
+```js
+const reference = { name: 'Zagatti' }
+const newReference = reference
+
+console.log(reference === newReference) // true
+```
+
+Como podemos ver o operador de comparação retornou `true`, isso por que a comparação
+é entre o mesmo objeto, isso é o que podemos chamar de atribuição por referência.
+
+Esse é o tipo de atribuição que devemos ter mais atenção e cuidado, pois se alterarmos
+o objeto por qualquer uma das variáveis, será refletido na outra.
+
+```js
+const reference = { name: 'Zagatti' }
+const newReference = reference
+newReference.name = 'Andre'
+
+console.log(reference) // { name: 'Andre' }
+```
+
+Existem muitas formas de criar uma nova referência para o objeto, a mais utilizada
+é com o spread que foi introduzido no ES6.
+
+```js
+const reference = { name: 'Zagatti' }
+const newReference = { ...reference }
+newReference.name = 'Andre'
+
+console.log(reference) // { name: 'Zagatti' }
+```
+
+No dia a dia utilizamos muito arrays de objetos e nesse caso é onde começa a ficar
+mais complexo em tomar cuidado com a referência, pois conseguimos criar um novo
+array com o spread, mas ainda teremos as mesmas referências de objetos internos e
+se torna mais complexo quando temos ainda mais níveis no objeto com outros objetos.
+
+```js
+const reference = [{ name: 'Zagatti' }]
+const newReference = [...reference]
+newReference[0].name = 'Andre'
+
+console.log(reference) // [{ name: 'Andre' }]
+```
+
+Existem
+[várias formas de clonar um array ou objeto no JavaScript](https://stackoverflow.com/questions/728360/how-do-i-correctly-clone-a-javascript-object)
+mas deixo para você ler no link ou pesquisar mais sobre.
+
+## Cuidado com a mutabilidade
+
+Em diversos casos criamos funções para manipular arrays dentro do JavaScript, com
+isso devemos tomar cuidado com alguns métodos que alteram diretamente o array, ao
+invés disso na maioria dos casos é preferível os métodos que geram e retornam um
+novo array ou dado.
+
+```js
+const array = [1, 2, 3]
+
+function removeLastItem(arr) {
+  arr.splice(-1, 1)
+  return arr
+}
+
+const newArray = removeLastItem(array)
+
+console.log(array) // [1, 2]
+console.log(newArray) // [1, 2]
+```
+
+Em muitos casos queremos preservar o valor original então o exemplo com `splice`
+não funcionaria bem, para a mesma operação temos o método `slice`.
+
+```js
+const array = [1, 2, 3]
+
+function removeLastItem(arr) {
+  return arr.slice(null, -1)
+}
+
+const newArray = removeLastItem(array)
+
+console.log(array) // [1, 2, 3]
+console.log(newArray) // [1, 2]
+```
+
+Os métodos que mutam o array são: `copyWithin`, `fill`, `flat`, `pop`, `push`,
+`reverse`, `shift`, `sort`, `splice` e `unshift`. Todos os outros criam um novo
+dado mantendo o array original intacto.
+
+## Conclusão
+
+Entender os diferentes tipos de dados de uma linguagem é essencial para se trabalhar
+em alto nível, sem entender a diferença de atribuir um valor ou uma referência a
+uma variável fica complexo de entender o fluxo de dados da aplicação e prever dados
+sendo mudados em contextos diferentes tendo a mesma referência espalhada pela aplicação.
+
+Não é um conceito difícil de se entender e espero que no fim desse post você tenha
+entendido como criar vantagens em diferentes contextos, mutando ou não suas
+estruturas de dados.
+
+#### Referências
+
+- [Valores Primitivos](https://developer.mozilla.org/pt-BR/docs/Glossary/Primitive)
+- [Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)
+- [Function](https://developer.mozilla.org/en-US/docs/Glossary/Function)
+- [JavaScript data types and data structures](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures)
+- [Clone JavaScript Object](https://stackoverflow.com/questions/728360/how-do-i-correctly-clone-a-javascript-object)
+- [Mutating x Non-mutating array methods](https://stackoverflow.com/a/54836218/11501938)

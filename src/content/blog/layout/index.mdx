@@ -1,0 +1,85 @@
+---
+title: Layout - Header, Main, Footer
+pubDate: "2020-08-17T22:15:34.284Z"
+description: "Explicando um Layout simples para páginas com header, main e footer"
+tags: [html, css, layout]
+keywords: [html, css, layout]
+heroImage: '/layout.png'
+---
+
+Como meu primeiro post do blog vou mostrar uma estrutura de layout que ando utilizando quando preciso de um layout com `header`, `main` e `footer`.
+
+Um amigo precisou de uma ajuda para posicionar o Footer sempre no fim da página e ele ir descendo com o scroll. O primeiro teste que vem na cabeça é o position absolute, claro, mas o problema é que ele não acompanha o scroll e fica flutuando no meio da página.
+
+```html
+<div class="container">
+  <header>
+    Teste
+  </header>
+  <main>
+    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Esse ut modi
+    non commodi, dolorem expedita atque eos explicabo omnis doloremque illo,
+    nesciunt nulla delectus, id molestias! Necessitatibus non illum fugiat.
+  </main>
+  <footer>
+    Copyright 2020
+  </footer>
+</div>
+```
+
+Na estrutura de HTML acima está um layout padrão em várias páginas, mas e como fazer o `main` ocupar toda a área da tela menos a àrea do `header` e do `footer`?
+
+```css
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  min-height: 100vh;
+  padding: 0;
+  margin: 0;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+header {
+  background-color: #3a3a3a;
+  width: 100%;
+  color: #fff;
+  padding: 15px 30px;
+}
+
+main {
+  flex: 1;
+}
+
+footer {
+  background-color: #7159c1;
+  padding: 15px 30px;
+  color: #fff;
+}
+```
+
+Antes do `.container` são somente alguns resets* de CSS e regular a altura do `html` e do `body` em pelo menos 100% da tela.
+
+\**Reset de CSS seria retirar alguns estilos padrões que já vem nativamente nas tags*
+
+O que interessa está logo a baixo, adicionando o `display: flex` para o container, alinhando a direção em colunas e dizendo para ele pegar 100% da altura já é o início.
+
+Mas somente com isso não é o suficiente, os elementos ainda vão ficar grudados na parte superior da tela. Ai entra a propriedade `flex` que é uma junção do `flex-grow`, `flex-shrink` e `flex-basis`, fazendo o `main` ocupar todo o espaço restante do container.
+
+Depois de fazer esse layout, encontrei outras formas como por exemplo usando `display: grid`, mas achei a minha abordagem tão simples e reutilizável que sempre utilizo quando necessário.
+
+Para testar facilmente esse layout, só entrar nesse link: https://codesandbox.io/s/layout-vnpij?file=/styles.css:286-300
+
+## Alguns links úteis:
+
+Flexbox: https://developer.mozilla.org/pt-BR/docs/Learn/CSS/CSS_layout/Flexbox
+
+Propriedade flex: https://developer.mozilla.org/pt-BR/docs/Web/CSS/flex

@@ -1,0 +1,515 @@
+---
+title: Migrando para React Hooks e Hook customizado
+pubDate: '2020-09-03'
+description: 'Explicando o comportamento dos React Hooks para quem está acostumado com os componentes de classe'
+tags: [javascript, react]
+keywords: [javascript, react, class, hooks, lifecycle]
+heroImage: '/migrate-to-hooks.png'
+---
+
+## Introdução
+
+Quais as motivações de utilizar a API de hooks no React? Esse é um assunto
+extenso e técnico então vou tentar resumir alguns pontos.
+
+Quando utilizamos componentes de classe é realmente complexo reutilizar a
+lógica com estado, utilizamos
+[render-props](https://pt-br.reactjs.org/docs/render-props.html) e
+[high-order components](https://pt-br.reactjs.org/docs/higher-order-components.html)
+para tentar resolver esses casos mas esses padrões acabavam obrigando a
+reestruturar os componentes, criando o famoso
+"[wrapper hell](https://miro.medium.com/max/958/1*SU5_ws88Kh_Oio_L4Myhvg.png)"
+de componentes.
+
+Componentes complexos se tornam difíceis de ler quando se tem métodos diferentes
+dividindo lógica, como o `componentDidMount` criando event listeners e o
+componentWillUnmount limpando esses listeners. Códigos que tratam da mesma
+coisa acabam ficando separados e códigos que não se relacionam acabam
+ficando juntos.
+
+Para entender mais profundamente a motivado recomendo a própria documentação:
+https://pt-br.reactjs.org/docs/hooks-intro.html#motivation
+
+## Componente de classe
+
+Abaixo um típico componente de classe do React com estado e utilizando métodos
+do ciclo de vida.
+
+```jsx
+import React, { PureComponent } from 'react';
+
+import './styles.css';
+
+export default class Class extends PureComponent {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      name: 'Zagatti',
+      count: 0,
+    };
+
+    this.updateName = this.updateName.bind(this);
+    this.increment = this.increment.bind(this);
+    this.decrement = this.decrement.bind(this);
+  }
+
+  componentDidMount() {
+    document.title = `${this.state.name}'s counter`;
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.name !== this.state.name) {
+      document.title = `${this.state.name}'s counter`;
+    }
+  }
+
+  increment() {
+    this.setState((state) => {
+      return { count: state.count + 1 };
+    });
+  }
+
+  decrement() {
+    this.setState((state) => {
+      return { count: state.count - 1 };
+    });
+  }
+
+  updateName(e) {
+    this.setState({ name: e.target.value });
+  }
+
+  render() {
+    return (
+      <div id="section">
+        <div class="top">
+          <label>Nome:</label>
+
+          <input
+            type="text"
+            name="name"
+            placeholder="Seu nome"
+            value={this.state.name}
+            onChange={this.updateName}
+          />
+        </div>
+
+        <div class="buttons">
+          <button onClick={this.decrement}>-</button>
+
+          <span>{this.state.count}</span>
+
+          <button onClick={this.increment}>+</button>
+        </div>
+      </div>
+    );
+  }
+}
+```
+
+`count` é o estado que armazena o valor do contador para ser exibido.
+`name` armazena o valor do input que é exibido no título da página.
+Utilizamos o `componentDidMount` para carregar o primeiro valor no título da
+página e o `componentDidUpdate` para atualizar quando o input for alterado.
+Além dos componentes do ciclo de vida temos as funções `increment` e `decrement`
+para alterar o contador. No final do componente está o JSX dentro do método
+render que será renderizado na tela.
+
+Observamos que o código fica verboso com muitos dados no constructor somente
+para linkar as funções a classe, assim com as atualizações do React foi
+implementada uma sintaxe sem utilizar o constructor utilizando as
+[arrow functions](https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Functions/Arrow_functions)
+disponíveis no ES6.
+
+```jsx
+import React, { PureComponent } from 'react';
+
+import './styles.css';
+
+export default class Class extends PureComponent {
+  state = {
+    name: 'Zagatti',
+    count: 0,
+  };
+
+  componentDidMount() {
+    document.title = `${this.state.name}'s counter`;
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.name !== this.state.name) {
+      document.title = `${this.state.name}'s counter`;
+    }
+  }
+
+  increment = () => {
+    this.setState((state) => {
+      return { count: state.count + 1 };
+    });
+  };
+
+  decrement = () => {
+    this.setState((state) => {
+      return { count: state.count - 1 };
+    });
+  };
+
+  updateName = (e) => {
+    this.setState({ name: e.target.value });
+  };
+
+  render() {
+    return (
+      <div id="section">
+        <div class="top">
+          <label>Nome:</label>
+
+          <input
+            type="text"
+            name="name"
+            placeholder="Seu nome"
+            value={this.state.name}
+            onChange={this.updateName}
+          />
+        </div>
+
+        <div class="buttons">
+          <button onClick={this.decrement}>-</button>
+
+          <span>{this.state.count}</span>
+
+          <button onClick={this.increment}>+</button>
+        </div>
+      </div>
+    );
+  }
+}
+```
+
+Dessa forma já conseguimos eliminar algumas linhas de código e deixar o
+componente mais legível e sem ter que linkar cada nova função no constructor.
+Mas então, será que utilizando a API de hooks esse código pode ficar mais
+legível ainda?
+
+```jsx
+import React, { useState, useEffect, memo } from 'react';
+
+import './styles.css';
+
+function Hooks() {
+  const [name, setName] = useState('Zagatti');
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    document.title = `${name}'s counter`;
+  }, [name]);
+
+  function increment() {
+    setCount((state) => state + 1);
+  }
+
+  function decrement() {
+    setCount((state) => state - 1);
+  }
+
+  function updateName(e) {
+    setName(e.target.value);
+  }
+
+  return (
+    <div id="section">
+      <div class="top">
+        <label>Nome:</label>
+
+        <input
+          type="text"
+          name="name"
+          placeholder="Seu nome"
+          value={name}
+          onChange={updateName}
+        />
+      </div>
+
+      <div class="buttons">
+        <button onClick={decrement}>-</button>
+
+        <span>{count}</span>
+
+        <button onClick={increment}>+</button>
+      </div>
+    </div>
+  );
+}
+
+export default memo(Hooks);
+```
+
+`useState`? `useEffect`? `memo`? Funções dentro de outra função?
+
+Os hooks sempre começam com a nomenclatura de "use" e sim é possível criar uma
+função dentro de outra e facilmente utilizar no componente sem a necessidade
+do `this`.
+
+`useState` é utilizado para declarar um estado, essa função recebe um valor
+inicial e retorna um array, sendo a primeira posição o valor atual do estado
+e a segunda uma função para atualizar esse valor.
+
+`useEffect` é utilizado para tratar side-effects nos componentes funcionais.
+Ele recebe uma função que vai ser disparada assim que o componente for
+renderizado e como segundo parâmetro um array de dependências, caso haja uma
+alteração nessa dependência ele será disparado novamente. É possível declarar
+múltiplos "effects" no mesmo componente. Isso ajuda a manter separadas as
+responsabilidades para cada efeito colateral, em vez de criar lógica condicional
+em um método.
+
+`memo` é um high order component similar ao PureComponent utilizado para
+componentes de funções. Assim como o PureComponent ele compara superficialmente
+as alterações nas props e diferente do PureComponent ele permite o componente
+re-renderizar quando existe uma alteração no useState ou useContext. É possível
+passar um segundo parâmetro com uma função customizada que recebe as
+"previousProps" e "nextProps", lembrando que o PureComponent e o memo existem
+para otimizar a perfomance, não confie para previnir uma renderização, pois pode
+causar bugs.
+
+## Como os hooks funcionam no componente?
+
+No novo componente, aplicamos o hook `useState` para declarar duas variáveis
+de estado: name e count. Ambos têm funções respectivas para atualizá-los:
+setName e setCount. Não utilizando um único estado em forma de objeto com
+vários valores.
+
+Chamamos `useEffect` para alterar o título da página após a renderização. Um
+array de dependências é passado como segundo parâmetro para garantir que o
+side effect seja disparado sempre que o name for alterado.
+
+De maneira semelhante ao componente baseado em classe, usamos JSX para declarar
+os elementos do DOM e eventos.
+
+## Bônus
+
+Um recurso muito utilizado no React com componentes de classe é o
+`componentWillUnmount` para limpar event listeners e lógicas que podem ficar
+rodando em background quando o componente é destruído, nesse caso
+adicionamos um return com uma função dentro do useEffect, como por exemplo:
+
+```jsx
+const [count, setCount] = useState(0);
+
+useEffect(() => {
+  const interval = setInterval(() => setCount(count + 1), 1000);
+  return () => {
+    clearInterval(interval);
+  };
+}, [count]);
+```
+
+Quando criamos métodos nos componentes de classe eles já são memoizados e só
+serão recriados caso mude algo que esse método utiliza. Acontece o mesmo com
+variáveis criadas com lógica fora do método `render`.
+
+Para isso o React fornece dois novos hooks para memoizar valores (`useMemo`) e outro para
+memoizar funções (`useCallback`), auxiliando na performance.
+
+```jsx
+import React, { useState, useEffect, memo } from 'react';
+
+import './styles.css';
+
+function Hooks() {
+  const [name, setName] = useState('Zagatti');
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    document.title = `${name}'s counter`;
+  }, [name]);
+
+  const increment = useCallback(() => {
+    setCount((state) => state + 1);
+  }, []);
+
+  const decrement = useCallback(() => {
+    setCount((state) => state - 1);
+  }, []);
+
+  const updateName = useCallback((e) => {
+    setName(e.target.value);
+  }, []);
+
+  const greeting = useMemo(() => {
+    return `Hello ${name}!!!`;
+  }, [name]);
+
+  return (
+    <div id="section">
+      <div class="top">
+        {greeting}
+        <label>Nome:</label>
+
+        <input
+          type="text"
+          name="name"
+          placeholder="Seu nome"
+          value={name}
+          onChange={updateName}
+        />
+      </div>
+
+      <div class="buttons">
+        <button onClick={decrement}>-</button>
+
+        <span>{count}</span>
+
+        <button onClick={increment}>+</button>
+      </div>
+    </div>
+  );
+}
+
+export default memo(Hooks);
+```
+
+De preferência sempre utilize esses hooks para criar valores e funções dentro
+dos componentes, dentro do componente funcional deve ter somente hooks e o return
+do JSX.
+
+Por que utilizar callback para pegar o valor antigo do `count`? Como o setState
+não é síncrono, é recomendado utilizar um callback que fornece como parâmetro o
+valor atual do estado para evitar side-effects.
+Para testar tenho esse exemplo: https://codesandbox.io/s/setstatesafe-62pmg
+
+## Criando nosso próprio Hook
+
+Sim, é possível criar seus próprios Hooks extraindo lógicas de componentes.
+Hooks só podem ser utilizados dentro de componentes, mas é possível utilizá-los
+para criar nossos próprios hooks.
+
+Quando queremos compartilhar lógica entre funções no Javascript, criamos uma
+nova função com essa responsabilidade. Componentes e Hooks também são funções,
+então funciona para eles também.
+
+Para criar um Hook customizado é criada uma função Javascript com o nome
+iniciando com "use" e que utiliza outros Hooks. Como exemplo abstrai o estado
+de count e as funções de increment e decrement do componente.
+
+```jsx
+import { useState } from 'react';
+
+export default function useCount() {
+  const [count, setCount] = useState(0);
+
+  const increment = useCallback(() => {
+    setCount((state) => state + 1);
+  }, []);
+
+  const decrement = useCallback(() => {
+    setCount((state) => state - 1);
+  }, []);
+
+  return { count, increment, decrement };
+}
+```
+
+Até então nenhuma novidade, uma nova função com o estado de count e as funções
+increment e decrement. O retorno da função é um objeto com o estado e as funções,
+agora vamos ver como é a utilização.
+
+```jsx
+import React, { useState, useEffect, memo } from 'react';
+
+import useCount from '../hooks/useCount';
+
+import './styles.css';
+
+function Hooks() {
+  const [name, setName] = useState('Zagatti');
+  const { count, increment, decrement } = useCount();
+
+  useEffect(() => {
+    document.title = `${name}'s counter`;
+  }, [name]);
+
+  const updateName = useCallback((e) => {
+    setName(e.target.value);
+  }, []);
+
+  const greeting = useMemo(() => {
+    return `Hello ${name}!!!`;
+  }, [name]);
+
+  return (
+    <div id="section">
+      <div class="top">
+        {greeting}
+        <label>Nome:</label>
+
+        <input
+          type="text"
+          name="name"
+          placeholder="Seu nome"
+          value={name}
+          onChange={updateName}
+        />
+      </div>
+
+      <div class="buttons">
+        <button onClick={decrement}>-</button>
+
+        <span>{count}</span>
+
+        <button onClick={increment}>+</button>
+      </div>
+    </div>
+  );
+}
+
+export default memo(Hooks);
+```
+
+Simplesmente recebendo o retorno do Hook useCount é possível utilizar o estado e
+as funções. Caso outra página precise utilizar um contador agora não é necessário
+duplicar a lógica pela aplicação.
+
+**Esse código equivale ao original?** Sim, apenas foi extraída a lógica para uma
+função reutilizável.
+
+**É necessário nomear os Hooks com "use"?** Não é obrigatório, mas faça isso.
+Com essa convenção o React é capaz de verificar violações nas regras dos Hooks.
+
+**Componentes que utilizam esse Hook compartilham estado?** Não, cada componente
+vai ter seu próprio estado, para compartilhar é necessário utilizar
+Context API, Redux, MobX, RecoilJS ou outro gerenciador de estados globais.
+
+Caso queira ver o código em funcionamento:
+https://codesandbox.io/s/migrate-to-hooks-whbc0?file=/src/App.js
+
+## Conclusão
+
+Feito! Conseguimos migrar um componente escrito em classe para um componente
+funcional utilizando a API de Hooks. O modo de desenvolver no React com os
+Hooks pode parecer estranho no começo mas com o tempo se torna algo natural e
+com um código mais legível. Também criamos um Hook customizado separando a
+lógica do componente e tornando reutilizável, a criação de Hooks customizados
+é algo que deve ser explorado.
+
+**Mas não se preocupe**, isso não significa que você deve migrar todo o código que
+já existe para a API de Hooks, mas na hora de criar novos componentes é algo a
+se considerar.
+
+### Fontes:
+
+https://reactjs.org/docs/hooks-intro.html ou https://pt-br.reactjs.org/docs/hooks-intro.html
+
+https://www.youtube.com/watch?v=dpw9EHDh2bM
+
+https://medium.com/better-programming/migrating-react-class-based-component-to-react-hooks-6fb310aed798
+
+https://www.robinwieruch.de/react-hooks-migration
+
+#### Recomendação de conteúdos:
+
+Rocketseat com muitos conteúdos com React Hooks: https://cutt.ly/0yjvA6A
+
+Vinicius Dacal com vídeos de React, JS e etc: https://cutt.ly/TyjvSlz
+
+Meu canal que logo mais postarei: https://cutt.ly/nyjvJk6

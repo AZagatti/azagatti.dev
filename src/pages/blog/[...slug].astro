@@ -1,5 +1,5 @@
 ---
-import { CollectionEntry,getCollection } from 'astro:content'
+import { CollectionEntry, getCollection } from 'astro:content'
 import { Post } from '../../components/post'
 import BaseLayout from '../../layouts/BaseLayout.astro'
 
@@ -13,11 +13,13 @@ export async function getStaticPaths() {
 type Props = CollectionEntry<'blog'>
 
 const post = Astro.props
-const { Content } = await post.render()
+const { Content, remarkPluginFrontmatter } = await post.render()
 ---
 
 <BaseLayout>
-  <Post post={post.data}>
+  <Post
+    post={{ ...post.data, minutesRead: remarkPluginFrontmatter.minutesRead }}
+  >
     <Content />
   </Post>
 </BaseLayout>

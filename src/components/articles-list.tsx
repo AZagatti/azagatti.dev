@@ -2,7 +2,13 @@ import type { CollectionEntry } from 'astro:content'
 import { formatDate } from '../utils/formatDate'
 
 interface ArticlesListProps {
-  articles: CollectionEntry<'blog'>[]
+  articles: Array<
+    CollectionEntry<'blog'> & {
+      data: {
+        minutesRead: string
+      }
+    }
+  >
 }
 
 export const ArticlesList = ({ articles }: ArticlesListProps) => {
@@ -12,15 +18,15 @@ export const ArticlesList = ({ articles }: ArticlesListProps) => {
         <div key={article.data.title} className="mt-auto h-full">
           <a
             href={`/blog/${article.slug}`}
-            className="decoration-transparent flex flex-col justify-between h-full hover:opacity-80"
+            className="no-underline flex flex-col justify-between h-full hover:opacity-80"
           >
             <div>
-              <h3 className="text-3xl text-start mb-2 dark:text-white">{article.data.title}</h3>
+              <h3 className="text-3xl text-start mb-2">{article.data.title}</h3>
             </div>
             <div>
               <p className="text-gray-500 mb-4 dark:text-gray-300">
                 {formatDate(new Date(article.data.pubDate), 'pt')} —
-                {/* {article.readingTime} */}
+                {` ${article.data.minutesRead}`}
               </p>
               <img
                 src={`${article.data.heroImage}`}

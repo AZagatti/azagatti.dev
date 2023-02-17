@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useLocalStorage } from '../hooks/useLocalStorage'
+import { useCookiesStorage } from '../hooks/useCookiesStorage'
 import { Moon } from './icons/moon'
 import { Sun } from './icons/sun'
 
@@ -11,12 +11,11 @@ enum Themes {
 const storageKey = 'azagatti:theme'
 
 export const Header = () => {
-  const [theme, setTheme] = useLocalStorage(storageKey, 'dark')
+  const [theme, setTheme] = useCookiesStorage(storageKey, Themes.Dark)
 
   function toggleTheme() {
-    window.document.documentElement.classList.toggle(Themes.Dark)
+    document.documentElement.classList.toggle(Themes.Dark)
     const newTheme = theme === Themes.Dark ? Themes.Light : Themes.Dark
-    localStorage.setItem(storageKey, newTheme)
     setTheme(newTheme)
   }
 
@@ -26,20 +25,20 @@ export const Header = () => {
       (!(storageKey in localStorage) &&
         window.matchMedia(`(prefers-color-scheme: ${Themes.Dark})`).matches)
     ) {
-      window.document.documentElement.classList.add(Themes.Dark)
+      document.documentElement.classList.add(Themes.Dark)
       setTheme(Themes.Dark)
     } else {
-      window.document.documentElement.classList.remove(Themes.Dark)
+      document.documentElement.classList.remove(Themes.Dark)
       setTheme(Themes.Light)
     }
   }, [])
 
   return (
     <>
-      <div className="items-center justify-center w-full py-4">
+      <div className="items-center justify-center w-full pt-8">
         <nav className="flex max-w-6xl px-8 justify-between items-center flex-1 mx-auto">
-          <h2 className="text-3xl dark:text-white">
-            <a href="/blog" className="decoration-transparent hover:opacity-70">
+          <h2 className="text-3xl">
+            <a href="/blog" className="no-underline hover:opacity-70">
               André Zagatti
             </a>
           </h2>
@@ -52,7 +51,7 @@ export const Header = () => {
           </button>
         </nav>
       </div>
-      <hr className="my-8 w-full dark:opacity-30" />
+      <hr />
     </>
   )
 }

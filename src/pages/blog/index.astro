@@ -1,15 +1,25 @@
 ---
-import { getCollection } from 'astro:content'
+import { getCollection, getEntryBySlug } from 'astro:content'
 import { ArticlesList } from '../../components/articles-list'
 import BaseHead from '../../components/BaseHead.astro'
 import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts'
 import BaseLayout from '../../layouts/BaseLayout.astro'
 
-const posts = (await getCollection('blog')).sort(
+const collection = await getCollection('blog')
+const posts = collection.sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 )
+const frontmatters = (
+  await Promise.all(
+    collection.map(async (collection) => await collection.render())
+  )
+).map((item) => item.remarkPluginFrontmatter)
+const newPosts = posts.map((post, index) => ({
+  ...post,
+  data: { ...post.data, minutesRead: frontmatters[index].minutesRead },
+}))
 ---
 
 <BaseLayout>
-  <ArticlesList articles={posts} />
+  <ArticlesList articles={newPosts} />
 </BaseLayout>

@@ -3,11 +3,19 @@ import BaseHead from '../components/BaseHead.astro'
 import { Footer } from '../components/footer'
 import { Header } from '../components/header'
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts'
+import '@fontsource/nunito'
+import '@fontsource/roboto'
+
+const {
+  title = SITE_TITLE,
+  description = SITE_DESCRIPTION,
+  image,
+} = Astro.props
 ---
 
 <html lang="en">
   <head>
-    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+    <BaseHead title={title} description={description} image={image} />
   </head>
 
   <body>

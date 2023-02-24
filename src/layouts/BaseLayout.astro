@@ -1,10 +1,11 @@
 ---
+import '@fontsource/nunito'
+import '@fontsource/roboto'
 import BaseHead from '../components/BaseHead.astro'
 import { Footer } from '../components/footer'
 import { Header } from '../components/header'
-import { SITE_DESCRIPTION, SITE_TITLE } from '../consts'
-import '@fontsource/nunito'
-import '@fontsource/roboto'
+import { ToggleThemeBtn } from '../components/toggle-theme-btn'
+import { SITE_DESCRIPTION,SITE_TITLE } from '../consts'
 
 const {
   title = SITE_TITLE,
@@ -32,14 +33,16 @@ const {
           'https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.2.2/lazysizes.min.js'
         document.body.appendChild(script)
       }
-    </script></head
-  >
+    </script>
+  </head>
 
   <body>
     <div
       class="w-full flex items-center justify-center flex-col dark:bg-gray-800"
     >
-      <Header client:visible />
+      <Header>
+        <ToggleThemeBtn client:only />
+      </Header>
       <slot />
       <Footer />
     </div>

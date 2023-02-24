@@ -1,8 +1,6 @@
 ---
-import { getCollection, getEntryBySlug } from 'astro:content'
+import { getCollection } from 'astro:content'
 import { ArticlesList } from '../../components/articles-list'
-import BaseHead from '../../components/BaseHead.astro'
-import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts'
 import BaseLayout from '../../layouts/BaseLayout.astro'
 
 const collection = await getCollection('blog')

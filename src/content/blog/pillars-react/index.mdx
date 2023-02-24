@@ -4,10 +4,14 @@ pubDate: '2020-08-18'
 description: 'Explicando os pilares do React'
 tags: [javascript, react]
 keywords: [javascript, react, state, props, efeito]
-heroImage: '/pillars-react.png'
+heroImage: '/img/pillars-react.jpeg'
 ---
 
-![Os Pilares do React](/pillars-react.png)
+<img
+  src="/img/pillars-react.jpeg"
+  alt="Os Pilares do React"
+  class="w-full h-[30rem] object-cover"
+/>
 
 ---
 
@@ -23,7 +27,19 @@ O foco deste post é introduzir os pilares necessários para desenvolver suas pr
 
 Considere esse o primeiro componente da aplicação:
 
-![JSX](/jsx.png)
+```js
+import React from 'react';
+
+function App() {
+  return (
+    <div className="App">
+      <h1>Hello ReactJS</h1>
+    </div>
+  )
+}
+
+export default App;
+```
 
 Essa declaração estranha de tags não é uma string, muito menos HTML comum.
 

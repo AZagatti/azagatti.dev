@@ -1,6 +1,4 @@
-import Cookies from 'js-cookie'
-import { useEffect } from 'react'
-import { useCookiesStorage } from '../hooks/useCookiesStorage'
+import { useLayoutEffect, useState } from 'react'
 import { Moon } from './icons/moon'
 import { Sun } from './icons/sun'
 
@@ -12,19 +10,19 @@ enum Themes {
 const storageKey = 'azagatti:theme'
 
 export const ToggleThemeBtn = () => {
-  const [theme, setTheme] = useCookiesStorage(
-    storageKey,
-    Cookies.get(storageKey)
-  )
+  const [theme, setTheme] = useState(Themes.Dark)
 
   const toggleTheme = () => {
     document.documentElement.classList.toggle(Themes.Dark)
-    setTheme((state) => (state === Themes.Dark ? Themes.Light : Themes.Dark))
+    const newTheme = localStorage.getItem(storageKey) === Themes.Dark ? Themes.Light : Themes.Dark
+    localStorage.setItem(storageKey, newTheme)
+    setTheme(newTheme)
   }
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    const curTheme = localStorage.getItem(storageKey)
     if (
-      theme === Themes.Dark ||
+      curTheme === Themes.Dark ||
       (!(storageKey in localStorage) &&
         window.matchMedia(`(prefers-color-scheme: ${Themes.Dark})`).matches)
     ) {

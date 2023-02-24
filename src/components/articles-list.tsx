@@ -13,7 +13,7 @@ interface ArticlesListProps {
 
 export const ArticlesList = ({ articles }: ArticlesListProps) => {
   return (
-    <div className="grid gap-y-16 md:gap-x-4 min-h-screen md:m-4 max-w-6xl px-2 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-y-16 gap-x-4 min-h-screen m-4 max-w-6xl px-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
       {articles.map((article) => (
         <div key={article.data.title} className="mt-auto h-full">
           <a
@@ -29,7 +29,7 @@ export const ArticlesList = ({ articles }: ArticlesListProps) => {
                 {` ${article.data.minutesRead}`}
               </p>
               <img
-                src={`${article.data.heroImage}`}
+                src={article.data.heroImage}
                 alt={article.data.description}
                 className="w-full h-52 object-cover rounded-md transition-[box-shadow 0.1s]"
               />

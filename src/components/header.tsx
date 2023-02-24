@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useCookiesStorage } from '../hooks/useCookiesStorage'
+import { useLocalStorage } from '../hooks/useLocalStorage'
 import { Moon } from './icons/moon'
 import { Sun } from './icons/sun'
 
@@ -11,7 +11,7 @@ enum Themes {
 const storageKey = 'azagatti:theme'
 
 export const Header = () => {
-  const [theme, setTheme] = useCookiesStorage(storageKey, Themes.Dark)
+  const [theme, setTheme] = useLocalStorage(storageKey, Themes.Light)
 
   function toggleTheme() {
     document.documentElement.classList.toggle(Themes.Dark)

@@ -1,9 +1,8 @@
 import { Dispatch, SetStateAction, useCallback, useState } from 'react'
-import Cookies from 'js-cookie'
 
 type SetValue<T> = Dispatch<SetStateAction<T>>
 
-export const useCookiesStorage = <T>(
+export const useLocalStorage = <T>(
   key: string,
   initialValue: T
 ): [T, SetValue<T>] => {
@@ -12,7 +11,7 @@ export const useCookiesStorage = <T>(
       return initialValue
     }
     try {
-      const item = Cookies.get(key)
+      const item = localStorage.get(key)
       return item ? JSON.parse(item) : initialValue
     } catch (error) {
       console.log(error)
@@ -26,7 +25,7 @@ export const useCookiesStorage = <T>(
           value instanceof Function ? value(storedValue) : value
         setStoredValue(valueToStore)
         if (typeof window !== 'undefined') {
-          Cookies.set(key, JSON.stringify(valueToStore))
+          localStorage.set(key, JSON.stringify(valueToStore))
         }
       } catch (error) {
         console.log(error)

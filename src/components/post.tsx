@@ -7,7 +7,7 @@ interface PostProps {
 
 export const Post = ({ children, post }: PostProps) => {
   return (
-    <main className="max-w-6xl px-8">
+    <article className="max-w-6xl px-2 md:px-8">
       <div className="max-w-full">
         <h2 className="text-3xl fontbold">{post.title}</h2>
         <p className="text-lg font-normal pb-8 pt-2 text-gray-500 dark:text-gray-300">{`${formatDate(
@@ -16,6 +16,6 @@ export const Post = ({ children, post }: PostProps) => {
         )} — ${post.minutesRead}`}</p>
         <div className="markdown">{children}</div>
       </div>
-    </main>
+    </article>
   )
 }

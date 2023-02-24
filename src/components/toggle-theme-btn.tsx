@@ -41,6 +41,7 @@ export const ToggleThemeBtn = () => {
       type="button"
       className="bg-transparent border-none flex items-center justify-center"
       onClick={toggleTheme}
+      aria-label="Toggle theme"
     >
       {theme === Themes.Dark ? <Sun /> : <Moon />}
     </button>

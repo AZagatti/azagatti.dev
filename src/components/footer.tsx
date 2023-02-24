@@ -22,6 +22,7 @@ export const Footer = () => {
                 target="_blank"
                 rel="noreferrer noopener"
                 href="https://github.com/azagatti"
+                aria-label="Check my Github"
               >
                 <GithubIcon />
               </a>
@@ -30,6 +31,7 @@ export const Footer = () => {
                 target="_blank"
                 rel="noreferrer noopener"
                 href="https://www.linkedin.com/in/andre-zagatti/"
+                aria-label="Check my Linkedin"
               >
                 <LinkedinIcon />
               </a>
@@ -38,6 +40,7 @@ export const Footer = () => {
                 target="_blank"
                 rel="noreferrer noopener"
                 href="https://twitter.com/andre-zagatti/"
+                aria-label="Check my Twitter"
               >
                 <TwitterIcon />
               </a>

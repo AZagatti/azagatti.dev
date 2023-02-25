@@ -5,36 +5,18 @@ import BaseHead from '../components/BaseHead.astro'
 import { Footer } from '../components/footer'
 import { Header } from '../components/header'
 import { ToggleThemeBtn } from '../components/toggle-theme-btn'
-import { SITE_DESCRIPTION,SITE_TITLE } from '../consts'
+import { SITE_DESCRIPTION, SITE_TITLE } from '../consts'
 
 const {
   title = SITE_TITLE,
   description = SITE_DESCRIPTION,
   image,
 } = Astro.props
-
 ---
 
 <html lang="pt-br">
   <head>
     <BaseHead title={title} description={description} image={image} />
-    <script>
-      if ('loading' in HTMLIFrameElement.prototype) {
-        const iframes = document.querySelectorAll<HTMLIFrameElement>(
-          'iframe[loading="lazy"]'
-        )
-
-        iframes.forEach((iframe) => {
-          iframe.src = iframe.dataset.src ?? iframe.src
-        })
-      } else {
-        // Dynamically import the LazySizes library
-        const script = document.createElement('script')
-        script.src =
-          'https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.2.2/lazysizes.min.js'
-        document.body.appendChild(script)
-      }
-    </script>
   </head>
 
   <body>

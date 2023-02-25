@@ -1,23 +1,26 @@
 ---
 // Import the global.css file here so that it is included on
 // all pages through the use of the <BaseHead /> component.
-import '../styles/global.css';
+import '../styles/global.css'
 
 export interface Props {
-	title: string;
-	description: string;
-	image?: string;
+  title: string
+  description: string
+  image?: string
 }
 
-const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const canonicalURL = new URL(Astro.url.pathname, Astro.site)
 
-const { title, description, image = '/placeholder-social.jpg' } = Astro.props;
+const { title, description, image = '/placeholder-social.jpg' } = Astro.props
 ---
 
 <!-- Global Metadata -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta
+  name="apple-mobile-web-app-status-bar-style"
+  content="black-translucent"
+/>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <meta name="generator" content={Astro.generator} />
 
@@ -46,6 +49,56 @@ const { title, description, image = '/placeholder-social.jpg' } = Astro.props;
 
 <!-- Others -->
 <meta property="github:creator" content="azagatti" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&family=Roboto:wght@300;400;500;700;900&display=swap"
+/>
 
 <!-- Prism -->
 <link href="/prism-night-owl.css" rel="stylesheet" />
+
+<!-- Scripts -->
+<script>
+  if ('loading' in HTMLIFrameElement.prototype) {
+    const iframes = document.querySelectorAll<HTMLIFrameElement>(
+      'iframe[loading="lazy"]'
+    )
+
+    iframes.forEach((iframe) => {
+      iframe.src = iframe.dataset.src ?? iframe.src
+    })
+  } else {
+    // Dynamically import the LazySizes library
+    const script = document.createElement('script')
+    script.src =
+      'https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.2.2/lazysizes.min.js'
+    document.body.appendChild(script)
+  }
+</script>
+<script is:inline>
+  const Themes = {
+    Dark: 'dark',
+    Light: 'light',
+  }
+  const storageKey = 'azagatti:theme'
+
+  const theme = (() => {
+    if (
+      typeof localStorage !== 'undefined' &&
+      localStorage.getItem(storageKey)
+    ) {
+      return localStorage.getItem(storageKey)
+    }
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      return Themes.Dark
+    }
+    return Themes.Light
+  })()
+  if (theme === Themes.Light) {
+    document.documentElement.classList.remove(Themes.Dark)
+  } else {
+    document.documentElement.classList.add(Themes.Dark)
+  }
+</script>

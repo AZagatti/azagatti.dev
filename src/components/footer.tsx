@@ -7,7 +7,7 @@ export const Footer = () => {
     <>
       <hr />
       <div className="w-full flex items-center justify-center">
-        <div className="max-w-6xl px-8 flex-1">
+        <div className="max-w-6xl px-4 flex-1">
           <div className="flex gap-8 justify-between flex-col md:flex-row">
             <div>
               <h4 className="text-xl mb-8">André Zagatti</h4>

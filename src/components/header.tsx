@@ -4,7 +4,7 @@ export const Header = ({ children }: PropsWithChildren) => {
   return (
     <>
       <div className="items-center justify-center w-full pt-8">
-        <nav className="flex max-w-6xl px-8 justify-between items-center flex-1 mx-auto">
+        <nav className="flex max-w-6xl px-4 justify-between items-center flex-1 mx-auto">
           <h2 className="text-3xl">
             <a href="/blog" className="no-underline hover:opacity-70">
               André Zagatti

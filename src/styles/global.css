@@ -62,7 +62,4 @@
   .markdown ul {
     @apply ml-0;
   }
-  .markdown pre{
-    @apply w-[95vw] max-w-full overflow-auto;
-  }
 }

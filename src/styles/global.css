@@ -3,6 +3,9 @@
 @tailwind utilities;
 
 @layer base {
+  body {
+    font-family: 'Roboto', sans-serif;
+  }
   h1,
   h2,
   h3,
@@ -17,14 +20,14 @@
   li {
     @apply text-gray-900 dark:text-gray-50;
   }
-  body {
-    font-family: 'Roboto', sans-serif;
-  }
   hr {
     @apply my-8 w-full dark:opacity-30;
   }
   iframe {
     @apply h-[500px] rounded overflow-hidden w-full border-0;
+  }
+  .markdown img {
+    @apply w-full h-auto object-cover block;
   }
   .markdown h2 {
     @apply mt-12 mb-4 text-3xl font-bold;
@@ -34,9 +37,6 @@
   }
   .markdown p {
     @apply text-base mb-4;
-  }
-  .markdown div {
-    @apply my-4 grid;
   }
   .markdown ul {
     @apply ml-8;

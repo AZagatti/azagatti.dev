@@ -20,6 +20,7 @@ const { Content, remarkPluginFrontmatter } = await post.render()
   title={post.data.title}
   description={post.data.description}
   image={post.data.heroImage}
+  isPost
 >
   <Post
     post={{ ...post.data, minutesRead: remarkPluginFrontmatter.minutesRead }}

@@ -21,12 +21,12 @@ export const ArticlesList = ({ articles }: ArticlesListProps) => {
             className="no-underline flex flex-col h-full hover:opacity-80"
           >
             <img
-              src="/img/lqip.jpeg"
-              data-src={article.data.heroImage}
+              src={article.data.heroImage}
               alt={article.data.description}
               width="373"
               height="177"
-              className="lazyload h-auto object-cover block rounded-md transition-[box-shadow 0.1s]"
+              className="h-auto object-cover block rounded-md transition-[box-shadow 0.1s]"
+              loading="lazy"
             />
             <p className="text-gray-500 dark:text-gray-300 my-4">
               {formatDate(new Date(article.data.pubDate), 'pt')} —

@@ -7,11 +7,17 @@ export interface Props {
   title: string
   description: string
   image?: string
+  isPost: boolean
 }
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site)
 
-const { title, description, image = '/placeholder-social.jpg' } = Astro.props
+const {
+  title,
+  description,
+  image = '/placeholder-social.jpg',
+  isPost,
+} = Astro.props
 ---
 
 <!-- Global Metadata -->
@@ -49,16 +55,12 @@ const { title, description, image = '/placeholder-social.jpg' } = Astro.props
 
 <!-- Others -->
 <meta property="github:creator" content="azagatti" />
-<script
-  src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.2.2/lazysizes.min.js"
-  async=""
-></script>
 
 <!-- Prism -->
-<link href="/prism-night-owl.css" rel="stylesheet" />
+{isPost && <link href="/prism-night-owl.css" rel="stylesheet" />}
 
 <!-- Scripts -->
-<script>
+<script async defer>
   if ('loading' in HTMLIFrameElement.prototype) {
     const iframes = document.querySelectorAll<HTMLIFrameElement>(
       'iframe[loading="lazy"]'
@@ -67,8 +69,15 @@ const { title, description, image = '/placeholder-social.jpg' } = Astro.props
     iframes.forEach((iframe) => {
       iframe.src = iframe.dataset.src ?? iframe.src
     })
+  } else {
+    // Dynamically import the LazySizes library
+    const script = document.createElement('script')
+    script.src =
+      'https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.2.2/lazysizes.min.js'
+    document.body.appendChild(script)
   }
 </script>
+
 <script is:inline>
   const Themes = {
     Dark: 'dark',

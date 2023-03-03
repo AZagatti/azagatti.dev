@@ -66,7 +66,7 @@ const {
       'iframe[loading="lazy"]'
     )
 
-    iframes.forEach((iframe) => {
+    iframes?.forEach((iframe) => {
       iframe.src = iframe.dataset.src ?? iframe.src
     })
   } else {

@@ -13,27 +13,23 @@ interface ArticlesListProps {
 
 export const ArticlesList = ({ articles }: ArticlesListProps) => {
   return (
-    <div className="grid gap-y-16 gap-x-4 min-h-screen md:max-w-6xl px-4 xl:px-0 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-y-10 gap-x-4 min-h-screen md:max-w-6xl px-4 xl:px-0 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
       {articles.map((article) => (
         <div key={article.data.title} className="mt-auto h-full">
           <a
             href={`/blog/${article.slug}`}
-            className="no-underline flex flex-col justify-between h-full hover:opacity-80"
+            className="no-underline flex flex-col h-full hover:opacity-80"
           >
-            <div>
-              <h3 className="text-3xl text-start mb-2">{article.data.title}</h3>
-            </div>
-            <div>
-              <p className="text-gray-500 mb-4 dark:text-gray-300">
-                {formatDate(new Date(article.data.pubDate), 'pt')} —
-                {` ${article.data.minutesRead}`}
-              </p>
-              <img
-                src={article.data.heroImage}
-                alt={article.data.description}
-                className="h-auto object-cover block rounded-md transition-[box-shadow 0.1s]"
-              />
-            </div>
+            <img
+              src={article.data.heroImage}
+              alt={article.data.description}
+              className="h-auto object-cover block rounded-md transition-[box-shadow 0.1s]"
+            />
+            <p className="text-gray-500 dark:text-gray-300 my-4">
+              {formatDate(new Date(article.data.pubDate), 'pt')} —
+              {` ${article.data.minutesRead}`}
+            </p>
+            <h3 className="text-3xl text-start">{article.data.title}</h3>
           </a>
         </div>
       ))}

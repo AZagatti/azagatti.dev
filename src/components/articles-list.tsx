@@ -28,7 +28,7 @@ export const ArticlesList = ({ articles }: ArticlesListProps) => {
               className="h-auto object-cover block rounded-md transition-[box-shadow 0.1s]"
               loading="lazy"
             />
-            <p className="text-gray-500 dark:text-gray-300 my-4">
+            <p className="text-gray-500 dark:text-gray-300 my-2">
               {formatDate(new Date(article.data.pubDate), 'pt')} —
               {` ${article.data.minutesRead}`}
             </p>

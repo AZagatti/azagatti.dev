@@ -17,7 +17,7 @@ export const Footer = () => {
               </p>
             </div>
             <div>
-              <div className="flex justify-end mb-8">
+              <div className="flex md:justify-end mb-8">
                 <a
                   className="md:ml-8 text-2xl no-underline"
                   target="_blank"
@@ -47,7 +47,7 @@ export const Footer = () => {
                 </a>
               </div>
               <div>
-                <img src="/img/logo.png" alt="A. Zagatti Logo" width="200" />
+                <img src="/img/logo.png" alt="A. Zagatti Logo" width="200" height="56" />
               </div>
             </div>
           </div>

@@ -16,34 +16,39 @@ export const Footer = () => {
                 Native
               </p>
             </div>
-            <div className="flex items-start">
-              <a
-                className="md:ml-8 text-2xl no-underline"
-                target="_blank"
-                rel="noreferrer noopener"
-                href="https://github.com/azagatti"
-                aria-label="Check my Github"
-              >
-                <GithubIcon />
-              </a>
-              <a
-                className="ml-8 text-2xl no-underline"
-                target="_blank"
-                rel="noreferrer noopener"
-                href="https://www.linkedin.com/in/andre-zagatti/"
-                aria-label="Check my Linkedin"
-              >
-                <LinkedinIcon />
-              </a>
-              <a
-                className="ml-8 text-2xl no-underline"
-                target="_blank"
-                rel="noreferrer noopener"
-                href="https://twitter.com/andre-zagatti/"
-                aria-label="Check my Twitter"
-              >
-                <TwitterIcon />
-              </a>
+            <div>
+              <div className="flex justify-end mb-8">
+                <a
+                  className="md:ml-8 text-2xl no-underline"
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  href="https://github.com/azagatti"
+                  aria-label="Check my Github"
+                >
+                  <GithubIcon />
+                </a>
+                <a
+                  className="ml-8 text-2xl no-underline"
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  href="https://www.linkedin.com/in/andre-zagatti/"
+                  aria-label="Check my Linkedin"
+                >
+                  <LinkedinIcon />
+                </a>
+                <a
+                  className="ml-8 text-2xl no-underline"
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  href="https://twitter.com/andre-zagatti/"
+                  aria-label="Check my Twitter"
+                >
+                  <TwitterIcon />
+                </a>
+              </div>
+              <div>
+                <img src="/img/logo.png" alt="A. Zagatti Logo" width="200" />
+              </div>
             </div>
           </div>
           <p className="mt-16 mb-8 text-base">

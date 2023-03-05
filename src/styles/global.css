@@ -62,4 +62,7 @@
   .markdown ul {
     @apply ml-0;
   }
+  .markdown img + p {
+    @apply mt-4;
+  }
 }

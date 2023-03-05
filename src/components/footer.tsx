@@ -9,14 +9,14 @@ export const Footer = () => {
       <div className="w-full flex items-center justify-center">
         <div className="md:max-w-6xl px-4 xl:px-0 flex-1">
           <div className="flex gap-8 justify-between flex-col md:flex-row">
-            <div>
+            <div className="flex-1">
               <h4 className="text-xl mb-8">André Zagatti</h4>
               <p className="text-lg">
-                Frontend Software Engineering, specializing in mobile with React
-                Native
+                Engenheiro de software frontend que gosta de compartilhar
+                conhecimento
               </p>
             </div>
-            <div>
+            <div className="flex-1">
               <div className="flex md:justify-end mb-8">
                 <a
                   className="md:ml-8 text-2xl no-underline"
@@ -46,8 +46,13 @@ export const Footer = () => {
                   <TwitterIcon />
                 </a>
               </div>
-              <div>
-                <img src="/img/logo.png" alt="A. Zagatti Logo" width="200" height="56" />
+              <div className="flex md:justify-end">
+                <img
+                  src="/img/logo.png"
+                  alt="A. Zagatti Logo"
+                  width="200"
+                  height="56"
+                />
               </div>
             </div>
           </div>

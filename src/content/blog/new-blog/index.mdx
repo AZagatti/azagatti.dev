@@ -1,0 +1,195 @@
+---
+title: O novo azagatti.dev
+pubDate: '2023-03-04T00:00:00'
+description: 'Um pouco sobre a recriação do meu site utilizando Astro'
+tags: [javascript, astro, react, remix]
+keywords: [javascript, astro, react, remix]
+heroImage: '/img/new-blog.jpeg'
+---
+
+<img
+  src="/img/new-blog.jpeg"
+  alt="Um pouco sobre a recriação do meu site utilizando Astro"
+/>
+
+---
+
+Esse é o meu primeiro artigo depois da recriação desse site e fico bem feliz em
+finalmente ter lançado a primeira versão.
+
+O meu antigo blog era feito com [Gatsby](https://www.gatsbyjs.com/) e seu
+[template de blog](https://www.gatsbyjs.com/starters/gatsbyjs/gatsby-starter-blog/),
+como estava começando o blog fiz poucas alterações e funcionou perfeitamente,
+mesmo o hype em volta do Gatsby tendo diminuído acredito ser uma ótima ferramenta
+para o que se propõe.
+
+A ideia de recriar o blog surgiu em sair desse template padrão e aproveitar esse
+momento para estudar e testar novas ferramentas, em certo momento o
+[Remix](https://remix.run/) foi lançado de forma aberta e pouco tempo depois um
+[artigo do Kent C. Dodds](https://kentcdodds.com/blog/introducing-the-new-kentcdodds.com)
+de como o seu novo site foi feito utilizando o Remix, com isso já uni as ideias
+de experimentar o Remix e recriar o meu site.
+
+## Primeira versão com Remix
+
+Para quem não conhece Remix deixo o resumo do próprio site:
+
+O Remix é um framework full stack web que permite que você se
+concentre na interface do usuário e trabalhe de acordo com os padrões da
+web para oferecer uma experiência de usuário rápida, elegante e resiliente.
+
+Resumindo minha experiência em utilizar o Remix nesse projeto, só devo dizer
+que esse framework é sensacional. Navegação, carregamentos, tratamentos de erros,
+formulários, busca de dados e muitas outras coisas que fazemos diariamente em
+aplicações web, é tudo tão fácil, `useEffect`, `useState`? Esqueça, os `loaders`,
+`actions` e outros recursos do Remix torna a DX (developer experience) incrível,
+além de utilizar os padrões da web que já estamos acostumados a décadas.
+
+Então criei um projeto do zero utilizando o Remix com Typescript, a criação do projeto
+foi bem simples e não precisei fazer muita coisa além disso. Para estilização
+decidi seguir com a biblioteca de interfaces [Chakra UI](https://chakra-ui.com/)
+por já ter utilizado algumas vezes e gostar do modelo declarativo de estilização,
+facilidade de implementar temas e ser desenvolvido para o React em si.
+
+Após ter feito a nova interface, segui para implementação do blog em si, com isso
+utilizei a biblioteca [MDX Bundler](https://github.com/kentcdodds/mdx-bundler)
+por ser bastante utilizada e já trazer algumas configurações prontas, como a leitura
+do arquivo `.mdx` e fazer uso do compilador [esbuild](https://esbuild.github.io/).
+
+A versão inicial com o MDX bundler funcionou, mas no template do Gatsby já vem
+integrado diversos plugins para o mdx, como por exemplo criar um link específico
+para os cabeçalhos do post. Com isso o script para gerar o artigo começou
+a crescer com diversas etapas, ler o arquivo mdx, passar o arquivo e os plugins
+para o MDX bundler, aguardar o build do esbuild, na página principal ordenar
+a lista dos artigos gerados, pegar os dados no componente e então renderizar.
+
+<img src="/img/mdx-build.jpeg" alt="Processo de build citado acima" />
+
+Esse processo de build citado não é tão rápido, então utilizei uma variável local
+no servidor para salvar o build sempre que acontecesse algum deploy, o Kent por
+exemplo utiliza o Redis para salvar os artigos gerados.
+
+Testei localmente a versão de produção e funcionou perfeitamente, o primeiro build
+levou um tempo mas os acessos seguintes foram todos muito rápidos, com isso decidi
+subir para produção e testar se estava tudo certo.
+
+Foi ai que tive o primeiro "problema", para funcionar o MDX bundler em hosts como
+Vercel, Netlify foi mais complexo, o Remix tem adapters para funcionar
+facilmente nesses hosts mas o problema estava em gerar os artigos no servidor,
+já que esses hosts utilizam o conceito `serverless` e só criam e rodam o servidor
+quando necessário, nisso o servidor criado não tinha acesso aos arquivos dos
+artigos que estavam em outra pasta rodando com o site. Decidi olhar outros
+hosts e encontrei o [Fly](https://fly.io/), moderno, com muitos recursos, fácil
+de utilizar e um ponto a mais é que o Remix fornece uma configuração pronta para
+o Fly.
+
+Por conta de outros compromissos não consegui avançar muito esse projeto por um
+tempo, mas em alguns momentos no projeto comecei a sentir que a complexidade
+para um blog começou a crescer muito, enquanto no Gatsby era tudo gerado estaticamente
+com vários plugins já no template inicial, com Remix por ser `SSR`
+(server side rendering) tive que fazer muita coisa do zero, além de pensar em
+infraestrutura para o deploy. Nesse meio tempo ocupado com outras coisas foi
+lançada a versão 1.0 do [Astro](https://astro.build/) e após ver o vídeo do
+[Fireship sobre o Astro](https://www.youtube.com/watch?v=gxBkghlglTg) e
+ler mais sobre esse framework, decidi dar uma chance para ele na recriação do
+blog.
+
+Obs: Ainda recomendo **muito** o Remix para projetos de aplicações dinâmicas,
+mas como ele não fornece API para `SSG` (static site generator), outras opções
+podem se sair melhor.
+
+## O brilho do Astro
+
+Para quem não conhece o [Astro](https://astro.build/) deixo o resumo do próprio
+site:
+
+Extraia conteúdo de qualquer lugar e sirva-o rapidamente com a
+`next-gen island architecture` do Astro.
+Astro é um web framework tudo em um para criar sites rápidos e focados em conteúdo.
+
+Vou resumir alguns pontos do Astro, de resto recomendo a leitura
+completa no [Por que Astro?](https://docs.astro.build/pt-br/concepts/why-astro/).
+
+O Astro é um framework agnóstico de bibliotecas de interface, ele tem um template
+próprio para a criação de interfaces que é utilizado para crias as `pages` que
+geram as rotas da aplicação, mas é possível criar componentes com diversas
+bibliotecas de interface como: React, Svelte, Vue, Solidjs, entre outros,
+além de diversas integrações diferente como: Tailwind e PartyTown, para ver outras
+integrações existe uma [página própria](https://astro.build/integrations/featured/).
+
+O framework ser agnóstico e essas integrações resumem o que é a arquitetura de
+"ilhas", quando utilizamos um desses frameworks para criar um
+componente é criada uma "ilha" responsável por carregar o JavaScript
+necessário da biblioteca e renderizar o componente em questão criando uma
+aplicação chamada
+[`MPA` (Multi-Page Application)](https://docs.astro.build/en/concepts/mpa-vs-spa/),
+sobre a arquitetura existe
+[uma documentação](https://docs.astro.build/en/concepts/islands/#what-is-an-astro-island).
+
+<img
+  src="/img/island-arch.jpeg"
+  alt="Desenho da arquitetura em 'ilha' com um cabeçalho e carrossel interativos e outros componentes estáticos"
+/>
+
+Resumindo alguns pontos e deixando links para ler mais sobre o Astro, posso
+contar um pouco da minha experiência utilizando essa ferramenta.
+
+De início utilizei o
+[template para blog](https://github.com/withastro/astro/tree/latest/examples/blog)
+por já iniciar com algumas integrações como mdx, rss, tags de SEO e sitemap. Fora
+essas integrações iniciais, migrei do Chakra UI por não ter integração oficial com
+o Astro e funcionar somente em componentes React. Então segui com o
+[Tailwind](https://tailwindcss.com/) que já tem uma integração oficial com o Astro
+e está muito em alta, sempre acompanhei por fora e nunca tive a possibilidade
+de utilizar o Tailwind, fora alguns testes.
+
+A interface foi muito fácil de converter, as props que eram utilizadas nos componentes
+do Chakra viraram as propriedades de `class` do Tailwind quase sem alterações.
+Um ponto é que o Chakra já fornece um tema `light/dark` com integração em seus
+componentes, utilizando hook de forma muito simples, com o Tailwind tive que
+implementar manualmente os estilos nos componentes com o seletor `dark:` e fazer
+a alteração manual com a class `dark` na tag `html`, diferente mas nada complexo.
+
+Com o ajuste na interface o projeto estava praticamente pronto, joguei os artigos
+que já estavam feitos do antigo blog e só adaptei alguns dados.
+
+A estrutura do projeto ficou bem simples, os componentes principais estão escritos
+em React com Typescript, a sua maioria sendo renderizado de forma estática e o
+botão de alterar tema está utilizando um estado para renderizar o ícone, então é
+criada uma "ilha" para esse botão carregar o JS do React e ter esse estado. Como
+comentei antes os componentes são agnósticos de framework mas as páginas escrevemos
+utilizando o formato `.astro`, esse formato é bem simples de se entender e
+utilizar, por enquanto as páginas são `/blog` e `/blog/post`, no futuro devo
+criar outras páginas e deixar o site mais completo.
+
+Graças ao Astro e como diz em sua página do por que utilizá-lo:
+
+**Rápido por padrão: Deve ser impossível construir um website lento com Astro.**
+
+O resultado no [PageSpeed](https://pagespeed.web.dev/) é muito satisfatório.
+
+<img
+  src="/img/page-speed.jpeg"
+  alt="Performance do novo site dando 100 em todas as métricas"
+/>
+
+## Conclusão
+
+Recriar o meu site foi a melhor ideia que tive, pois tive a oportunidade de testar
+o Remix de diversas formas e ver como esse framework é incrível, tem uma DX absurda,
+foca nos padrões da web e é muito robusto para criar uma aplicação com foco em
+toda essa parte dinâmica, renderização no servidor, criar um backend ou até
+mesmo apenas um `BFF` (backend for frontend), mantendo tudo em um projeto.
+
+Do outro lado comecei a utilizar o Astro pouco tempo após o seu lançamento e posso
+dizer que sempre que precisar criar um site com foco em conteúdo, visando performance,
+páginas estáticas e diversas outras features que o framework fornece, além de
+novidades que estão surgindo, não devo cogitar outra ferramenta além do Astro.
+
+É claro que não ficaria sem deixar o repositório de ambos os projetos:
+
+- [Site em Remix](https://github.com/AZagatti/remix-azagatti.dev)
+- [Site atual em Astro](https://github.com/AZagatti/azagatti.dev)
+
+Espero que esse artigo tenha sido interessante, mostrado um pouco dessas duas
+ferramentas e esclarecido onde e quando utilizar cada uma delas.

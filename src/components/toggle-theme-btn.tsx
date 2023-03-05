@@ -10,36 +10,26 @@ enum Themes {
 const storageKey = 'azagatti:theme'
 
 export const ToggleThemeBtn = () => {
-  const [theme, setTheme] = useState(Themes.Dark)
+  const [theme, setTheme] = useState(
+    () => localStorage.getItem(storageKey) ?? Themes.Light
+  )
 
   const toggleTheme = () => {
     document.documentElement.classList.toggle(Themes.Dark)
-    const newTheme = localStorage.getItem(storageKey) === Themes.Dark ? Themes.Light : Themes.Dark
+    const newTheme =
+      localStorage.getItem(storageKey) === Themes.Dark
+        ? Themes.Light
+        : Themes.Dark
     localStorage.setItem(storageKey, newTheme)
     setTheme(newTheme)
   }
-
-  useLayoutEffect(() => {
-    const curTheme = localStorage.getItem(storageKey)
-    if (
-      curTheme === Themes.Dark ||
-      (!(storageKey in localStorage) &&
-        window.matchMedia(`(prefers-color-scheme: ${Themes.Dark})`).matches)
-    ) {
-      document.documentElement.classList.add(Themes.Dark)
-      setTheme(Themes.Dark)
-    } else {
-      document.documentElement.classList.remove(Themes.Dark)
-      setTheme(Themes.Light)
-    }
-  }, [])
 
   return (
     <button
       type="button"
       className="bg-transparent border-none flex items-center justify-center"
       onClick={toggleTheme}
-      aria-label="Toggle theme"
+      aria-label="Alterar tema"
     >
       {theme === Themes.Dark ? <Sun /> : <Moon />}
     </button>

@@ -18,7 +18,7 @@
   p,
   a,
   li {
-    @apply text-gray-900 dark:text-gray-50;
+    @apply text-gray-800 dark:text-gray-200;
   }
   hr {
     @apply my-8 w-full dark:opacity-30;
@@ -36,7 +36,7 @@
     @apply mt-12 mb-4 text-2xl font-bold;
   }
   .markdown p {
-    @apply text-base mb-4;
+    @apply mb-4 text-lg;
   }
   .markdown ul {
     @apply ml-8;

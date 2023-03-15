@@ -1,0 +1,42 @@
+---
+import { getCollection } from 'astro:content'
+import i18next, { changeLanguage } from 'i18next'
+import { ArticlesList } from '../../components/articles-list'
+import BaseLayout from '../../layouts/BaseLayout.astro'
+
+export function getStaticPaths() {
+  return i18next.languages.map((lang) => {
+    return {
+      params: {
+        blog: lang === 'pt' ? 'blog' : `${lang}/blog`,
+      },
+      props: {
+        lang,
+      },
+    }
+  })
+}
+
+const { lang } = Astro.props
+changeLanguage(lang)
+
+const collection = (
+  await getCollection('blog', ({ id }) => {
+    return id.startsWith(`${lang}/`)
+  })
+).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+const frontmatters = (
+  await Promise.all(
+    collection.map(async (collection) => await collection.render())
+  )
+).map((item) => item.remarkPluginFrontmatter)
+const posts = collection.map((post, index) => ({
+  ...post,
+  data: { ...post.data, minutesRead: frontmatters[index].minutesRead },
+  slug: post.slug.split('/')[1]
+}))
+---
+
+<BaseLayout title="André Zagatti Blog">
+  <ArticlesList articles={posts} />
+</BaseLayout>

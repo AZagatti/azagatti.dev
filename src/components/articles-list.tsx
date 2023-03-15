@@ -4,13 +4,19 @@ import i18next from 'i18next'
 import { formatDate } from '../utils/formatDate'
 
 interface ArticlesListProps {
-  articles: Array<
-    CollectionEntry<'blog'> & {
-      data: {
-        minutesRead: string
-      }
+  articles: {
+    data: {
+      minutesRead: any
+      updatedDate?: Date | undefined
+      heroImage?: string | undefined
+      tags?: string[] | undefined
+      keywords?: string[] | undefined
+      title: string
+      description: string
+      pubDate: Date
     }
-  >
+    slug: string
+  }[]
 }
 
 export const ArticlesList = ({ articles }: ArticlesListProps) => {

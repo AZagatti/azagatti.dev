@@ -11,7 +11,9 @@ interface Data {
 
 export function remarkReadingTime() {
   return function (tree: Node, { data }: { data: Data }) {
-    const textOnPage = toString(tree)
+    const textOnPage = toString(tree, {
+      includeImageAlt: false,
+    })
     const readingTime = getReadingTime(textOnPage)
     // readingTime.text will give us minutes read as a friendly string,
     // i.e. "3 min read"

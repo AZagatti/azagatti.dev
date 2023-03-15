@@ -4,18 +4,27 @@ import { changeLanguage } from 'i18next'
 import { Post } from '../../components/post'
 import BaseLayout from '../../layouts/BaseLayout.astro'
 
-changeLanguage('pt')
-
 export async function getStaticPaths() {
   const posts = await getCollection('blog')
-  return posts.map((post) => ({
-    params: { slug: post.slug },
-    props: post,
-  }))
+  return posts.map((post) => {
+    const [lang, slug] = post.slug.split('/')
+    return {
+      params: {
+        blog: lang === 'pt' ? 'blog' : `${lang}/blog`,
+        slug,
+      },
+      props: { post, lang },
+    }
+  })
 }
-type Props = CollectionEntry<'blog'>
-const post = Astro.props
+type Props = {
+  post: CollectionEntry<'blog'>
+  lang: string
+}
+const { post, lang } = Astro.props
 const { Content, remarkPluginFrontmatter } = await post.render()
+
+changeLanguage(lang)
 ---
 
 <BaseLayout

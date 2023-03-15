@@ -98,15 +98,3 @@ const { title, description, image = '/logo.jpg', isPost } = Astro.props
     document.documentElement.classList.add(Themes.Dark)
   }
 </script>
-
-<script>
-  const isBlogHome = location.pathname.endsWith('/blog')
-  const isEnglish = document.querySelector<HTMLElement>('html')!.lang === 'en'
-  const isPostEnglish = location.pathname.endsWith('/en')
-  if (!isBlogHome && isEnglish && !isPostEnglish) {
-    location.pathname = `${location.pathname}/en`
-  }
-  if (!isBlogHome && !isEnglish && isPostEnglish) {
-    location.pathname = location.pathname.substring(0, location.pathname.length - 3)
-  }
-</script>

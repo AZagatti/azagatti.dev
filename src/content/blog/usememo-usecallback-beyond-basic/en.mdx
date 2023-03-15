@@ -1,0 +1,126 @@
+---
+title: useMemo and useCallback beyond the basics
+pubDate: '2021-09-20T03:00:00Z'
+description: 'Why useMemo and useCallback are very useful in addition to memoization.'
+tags: [
+    javascript,
+    react,
+    react-native,
+    hooks,
+    usememo
+    usecallback,
+    memoization,
+    reference,
+  ]
+keywords: [
+    javascript,
+    react,
+    react-native,
+    hooks,
+    usememo
+    usecallback,
+    memoization,
+    reference,
+  ]
+heroImage: '/img/usememo-usecallback-beyond-basic.jpeg'
+---
+
+<img
+  src="/img/usememo-usecallback-beyond-basic.jpeg"
+  alt="useMemo and useCallback beyond the basics"
+/>
+
+---
+
+## Keeping the Reference
+
+When we use the `useMemo` and `useCallback` hooks we have a behavior that
+help us not to cause loops in dependencies, because they both keep the same reference from
+when declared even when the values change.
+
+If you don't understand much about non-primitive object references, I recommend
+reading [this other article](/blog/assignment-value-and-reference/) where I comment more on assignment by value and
+reference.
+
+## Avoiding variable recreation
+
+The React hooks' dependency array does a `shallow' comparison,
+that is, it only checks if a primitive value has changed or if the reference
+of a non-primitive value has changed, so hooks keeping the reference is something that
+that makes all the difference, as in the following example that enters both the
+part of recreating the function only when the value changes and also a side effect of the
+side effect of the component without the hook having the internal state change whenever the
+when the parent component undergoes a rerender.
+
+In this example we have a counter in the parent component that starts at 0, in the child
+In the child components we have an internal counter for each, +1 is added on the first render and also when the
+also when the counter for the parent component is added, +1 is added to the children.
+We can see a side effect in the component without `useCallback` that the counter
+is added when an unrelated state of the parent component triggers a
+rerender, so the function in this child's dependency array is recreated with another
+another reference making the `useEffect` run again.
+
+<iframe
+  loading="lazy"
+  class="lazyload"
+  data-src="https://codesandbox.io/embed/usecallback-children-handler-g6f6f?expanddevtools=1&fontsize=14&hidenavigation=1&theme=dark"
+  title="usecallback-children-handler"
+  allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
+  sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
+></iframe>
+
+## Beware of loops
+
+Loops inside `useEffect` in React are very common cases and many of them can be
+can be solved just by using the `useMemo` or `useCallback` hooks, because by keeping
+the reference `useEffect` will only be executed again if any of the values in the
+dependency array of these hooks change.
+
+In the example we have a function simulating an API call, one option would be to remove
+the `fetchData` function from the `useEffect` dependency array, or if the function is
+used only in it we can declare it inside the `useEffect` itself, but instead of using
+instead of using these options, we can simply declare the function in a `useCallback`,
+then the call will only happen if the function is recreated from the `useCallback` dependency array.
+dependency array, so we also have to be careful not to add a dependency to `useCallback`.
+add a dependency to `useCallback` that causes a loop.
+
+Note: I created a value with `useRef` so that the loop would be limited to 200 and not crash
+the example.
+
+<iframe
+  loading="lazy"
+  class="lazyload"
+  data-src="https://codesandbox.io/embed/objective-noyce-d1eb5?expanddevtools=1&fontsize=14&hidenavigation=1&theme=dark"
+  title="useeffect-loop"
+  allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
+  sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
+></iframe>
+
+## The importance of references
+
+As I said before, it is good to be careful with references if you want to keep
+renderings under control, this is for both memoization and performance.
+
+Here is an example showing two components that receive almost the same
+data but one of them receives it without hooks and by any update has its `props` changed
+because the prop reference has changed.
+
+<iframe
+  loading="lazy"
+  class="lazyload"
+  data-src="https://codesandbox.io/embed/primitive-vs-hooks-cchcp?expanddevtools=1&fontsize=14&hidenavigation=1&theme=dark"
+  title="primitive-vs-hooks"
+  allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
+  sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
+></iframe>
+
+## Conclusion
+
+The more complex examples I presented as examples with `useCallback` are also useful
+for `useMemo`. One rule that I think is valid is, if a value or function is going to
+be passed by `props` to another component examine well, because it will probably
+it will probably be interesting to use one of these two hooks.
+
+And finally, I recommend reading [this article by
+Kent C. Dodds](https://kentcdodds.com/blog/usememo-and-usecallback)
+where he comments on the use of these two hooks.

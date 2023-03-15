@@ -7,11 +7,7 @@ keywords: [javascript, react, react native, web, mobile, ios, android]
 heroImage: '/img/react-web-to-native.jpeg'
 ---
 
-<img
-  src="/img/react-web-to-native.jpeg"
-  alt="Do React web pro native"
-  
-/>
+<img src="/img/react-web-to-native.jpeg" alt="Do React web pro native" />
 
 ---
 
@@ -27,7 +23,7 @@ para celulares, Windows e até mais recentemente para Mac.
 
 ## Similaridades
 
-Ambos utilizam o React, então conceitos como `props`, `state`, `component`, 
+Ambos utilizam o React, então conceitos como `props`, `state`, `component`,
 `lifecycle` e `hooks` se mantém não importa em qual plataforma. Também podemos
 utilizar bibliotecas que não utilizam coisas específicas do browser, como por
 exemplo gerenciadores de estado.
@@ -61,38 +57,38 @@ nativos como `<View>`, `<Text>`, `<TextInput>` e
 Web:
 
 ```tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'
 
 const App: React.FC = (props) => {
-  const [state, setState] = useState('');
+  const [state, setState] = useState('')
 
-  useEffect(() => {}, []);
+  useEffect(() => {}, [])
 
   return (
     <div>
       <h1>Hello World</h1>
     </div>
-  );
-};
+  )
+}
 ```
 
 Native:
 
 ```tsx
-import React, { useState, useEffect } from 'react';
-import { View, Text } from 'react-native';
+import React, { useState, useEffect } from 'react'
+import { View, Text } from 'react-native'
 
 const App: React.FC = (props) => {
-  const [state, setState] = useState('');
+  const [state, setState] = useState('')
 
-  useEffect(() => {}, []);
+  useEffect(() => {}, [])
 
   return (
     <View>
       <Text>Hello World</Text>
     </View>
-  );
-};
+  )
+}
 ```
 
 Obs: Todo texto no React Native deve estar dentro do componente `Text`.
@@ -115,23 +111,23 @@ Web:
 ```
 
 ```tsx
-import React from 'react';
+import React from 'react'
 
-import './styles.css';
+import './styles.css'
 
 const App: React.FC = () => {
   return (
     <div className="main">
       <h1>Hello World</h1>
     </div>
-  );
-};
+  )
+}
 ```
 
 Native:
 
 ```ts
-import { StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native'
 
 const styles = StyleSheet.create({
   main: {
@@ -141,22 +137,22 @@ const styles = StyleSheet.create({
   text: {
     color: '#fff',
   },
-});
+})
 ```
 
 ```tsx
-import React from 'react';
-import { View, Text } from 'react-native';
+import React from 'react'
+import { View, Text } from 'react-native'
 
-import styles from './styles.ts';
+import styles from './styles.ts'
 
 const App: React.FC = () => {
   return (
     <View style={styles.main}>
       <Text style={styles.text}>Hello World</Text>
     </View>
-  );
-};
+  )
+}
 ```
 
 Com esses exemplos podemos analisar melhor. Enquanto na web utilizamos o `css`
@@ -183,15 +179,15 @@ Na web o pacote mais famoso de rotas hoje pro React é o
 enquanto que no React Native o pacote mais famoso é o
 [react-navigation](https://reactnavigation.org/).
 
-Roteamento na web com react-router-dom:
+Roteamento na web com react-router-dom (v5):
 
 ```tsx
-import React from 'react';
-import { BrowserRouter, Switch, Route, Link } from 'react-router-dom';
+import React from 'react'
+import { BrowserRouter, Switch, Route, Link } from 'react-router-dom'
 
-const About: React.FC = () => <h1>About</h1>;
+const About: React.FC = () => <h1>About</h1>
 
-const Home: React.FC = () => <h1>Home</h1>;
+const Home: React.FC = () => <h1>Home</h1>
 
 const App: React.FC = () => (
   <BrowserRouter>
@@ -214,25 +210,25 @@ const App: React.FC = () => (
       </Route>
     </Switch>
   </BrowserRouter>
-);
+)
 ```
 
 Roteamento no React Native com react-navigation:
 
 ```tsx
-import 'react-native-gesture-handler';
-import React from 'react';
-import { View, Text } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import 'react-native-gesture-handler'
+import React from 'react'
+import { View, Text } from 'react-native'
+import { NavigationContainer } from '@react-navigation/native'
+import { createStackNavigator } from '@react-navigation/stack'
 
 const HomeScreen: React.FC = () => (
   <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
     <Text>Home Screen</Text>
   </View>
-);
+)
 
-const Stack = createStackNavigator();
+const Stack = createStackNavigator()
 
 const App: React.FC = () => (
   <NavigationContainer>
@@ -240,7 +236,7 @@ const App: React.FC = () => (
       <Stack.Screen name="Home" component={HomeScreen} />
     </Stack.Navigator>
   </NavigationContainer>
-);
+)
 ```
 
 ### Códigos específicos para cada plataforma
@@ -261,18 +257,18 @@ quando falamos em performance.
 Na web podemos mostrar valores de uma lista com um map:
 
 ```tsx
-import React from 'react';
+import React from 'react'
 
 const users = [
   { id: 0, name: 'André Zagatti', age: 23 },
   { id: 1, name: 'John Doe', age: 26 },
   { id: 2, name: 'Fulano', age: 31 },
   { id: 3, name: 'Ciclano', age: 43 },
-];
+]
 
 interface ItemListProps {
-  name: string;
-  age: number;
+  name: string
+  age: number
 }
 
 const ListItem: React.FC<ItemListProps> = ({ name, age }: ItemListProps) => (
@@ -280,7 +276,7 @@ const ListItem: React.FC<ItemListProps> = ({ name, age }: ItemListProps) => (
     <p>{name}</p>
     <p>{age}</p>
   </li>
-);
+)
 
 const App: React.FC = () => (
   <ul>
@@ -288,25 +284,25 @@ const App: React.FC = () => (
       <ListItem key={user.id} name={user.name} age={user.age} />
     ))}
   </ul>
-);
+)
 ```
 
 No React Native temos um componente de lista virtualizada no próprio pacote:
 
 ```tsx
-import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList } from 'react-native';
+import React, { useState, useEffect } from 'react'
+import { View, Text, FlatList } from 'react-native'
 
 const users = [
   { id: 0, name: 'André Zagatti', age: 23 },
   { id: 1, name: 'John Doe', age: 26 },
   { id: 2, name: 'Fulano', age: 31 },
   { id: 3, name: 'Ciclano', age: 43 },
-];
+]
 
 interface ItemListProps {
-  name: string;
-  age: number;
+  name: string
+  age: number
 }
 
 const ListItem: React.FC<ItemListProps> = ({ name, age }: ItemListProps) => (
@@ -314,7 +310,7 @@ const ListItem: React.FC<ItemListProps> = ({ name, age }: ItemListProps) => (
     <Text>{name}</Text>
     <Text>{age}</Text>
   </View>
-);
+)
 
 const App: React.FC = () => (
   <FlatList
@@ -324,7 +320,7 @@ const App: React.FC = () => (
       <ListItem name={user.name} age={user.age} />
     )}
   />
-);
+)
 ```
 
 ## Conclusão

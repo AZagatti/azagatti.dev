@@ -1,7 +1,7 @@
 ---
-title: Utilizando a Context API eficientemente
+title: Using the Context API efficiently
 pubDate: '2021-05-26T03:00:00Z'
-description: 'Formas de se utilizar a Context API do React eficientemente'
+description: "Ways to use React's Context API efficiently"
 tags:
   [
     html,
@@ -29,41 +29,23 @@ keywords:
 heroImage: '/img/context-api.jpeg'
 ---
 
-<img
-  src="/img/context-api.jpeg"
-  alt="Utilizando a Context API eficientemente"
-/>
+<img src="/img/context-api.jpeg" alt="Using the Context API efficiently" />
 
 ---
 
-## O que é Context API?
+## What is Context API?
 
-A <a rel="noreferrer noopener" target="_blank" href="https://pt-br.reactjs.org/docs/context.html">Context API</a>
-é uma forma de compartilhar
-dados entre componentes em diferentes níveis de uma árvore de elementos, muito
-utilizado para evitar <a rel="noreferrer noopener" target="_blank" href="https://kentcdodds.com/blog/prop-drilling">prop drilling</a>
-e até mesmo como um gerenciador de estados.
+The <a rel="noreferrer noopener" target="_blank" href="https://reactjs.org/docs/context.html">Context API</a> is a way to share data between components at different levels of an element tree, often used to avoid <a rel="noreferrer noopener" target="_blank" href="https://kentcdodds.com/blog/prop-drilling">prop drilling</a> and even as a state manager.
 
-O último caso que comentei sobre utilizar Context como um gerenciador de estados
-é polêmico, pois por muito tempo Redux, MobX e outros dominavam essa área e utilizamos
-esses gerenciadores mesmo não precisando, mas com certeza uma coisa que devemos
-tomar cuidado em utilizar a Context API como gerenciador de estados é que quando
-houver alterações em qualquer dado dele vai acontecer uma nova renderização, mesmo
-não utilizando o dado alterado especificamente.
+The last case I mentioned about using Context as a state manager is controversial because for a long time Redux, MobX, and others dominated this area, and we used these state managers even when we didn't need them. However, one thing we should be careful about when using the Context API as a state manager is that any changes to any data will trigger a new render, even if the changed data is not specifically used.
 
-## Mais sobre a Context API
+## More about Context API
 
-Primeiramente dependendo de quando estiver lendo este post, recomendo olhar <a rel="noreferrer noopener" target="_blank" href="https://github.com/facebook/react/pull/20646">essa Pull Request</a>
-no repositório
-do React, onde está sendo implementado uma forma de consumir somente um dado do
-contexto, também recomendo esses artigos do mestre <a rel="noreferrer noopener" target="_blank" href="https://kentcdodds.com">Kent C. Dodds</a>
-de como <a rel="noreferrer noopener" target="_blank" href="https://kentcdodds.com/blog/how-to-use-react-context-effectively">organizar um arquivo de Context</a>
-e <a rel="noreferrer noopener" target="_blank" href="https://kentcdodds.com/blog/how-to-optimize-your-context-value">como otimizá-lo</a>.
+Firstly, depending on when you are reading this post, I recommend checking out <a rel="noreferrer noopener" target="_blank" href="https://github.com/facebook/react/pull/20646">this Pull Request</a> in the React repository, where a way to consume only one data from the context is being implemented. I also recommend these articles by master <a rel="noreferrer noopener" target="_blank" href="https://kentcdodds.com">Kent C. Dodds</a> on how to <a rel="noreferrer noopener" target="_blank" href="https://kentcdodds.com/blog/how-to-use-react-context-effectively">organize a Context file</a> and <a rel="noreferrer noopener" target="_blank" href="https://kentcdodds.com/blog/how-to-optimize-your-context-value">how to optimize it</a>.
 
-## Como utilizar eficientemente
+## How to use it efficiently
 
-A minha definição de eficiente é, com uma API boa de se utilizar e que tenha boa
-performance independente do tamanho da aplicação.
+My definition of efficient is with a good API to use and has good performance regardless of the size of the application.
 
 ```tsx
 import { createContext, ReactNode, useCallback, useState } from 'react'
@@ -105,10 +87,9 @@ const CounterProvider = ({ children }: { children: ReactNode }) => {
 export { CounterProvider, counterContext }
 ```
 
-Normalmente definimos um contexto dessa forma, vou utilizar um exemplo de contador
-bem simples, mas imaginemos algo em escala maior.
+Normally we define a context like this, I'm going to use a very simple counter example, but let's imagine something on a larger scale.
 
-Para acompanhar as renderizações vou criar um `hook` e utilizar nos componentes
+To track the renders, I'm going to create a `hook` and use it in the components.
 
 ```tsx
 import { useRef } from 'react'
@@ -126,8 +107,7 @@ export const useRenderCounter = (componentName: string) => {
 }
 ```
 
-Para vermos as novas renderizações acontecendo vou separar em três componentes que
-utilizam esse contexto acima.
+To see the new renders happening, I'm going to separate it into three components that use the above context.
 
 ```tsx
 import { useContext } from 'react'
@@ -187,8 +167,7 @@ export const DecrementCounter = () => {
 }
 ```
 
-Com os componentes criados podemos centralizá-los e utilizar o `Provider` criado
-no arquivo de contexto.
+With the components created, we can centralize them and use the `Provider` created in the context file.
 
 ```tsx
 import { CounterProvider } from './ContextDefault'
@@ -209,7 +188,7 @@ export const MainDefaultContext = () => {
 }
 ```
 
-Testando:
+Testing:
 
 <iframe
   loading="lazy"
@@ -220,20 +199,13 @@ Testando:
   sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
 ></iframe>
 
-Você deve ter percebido que todos os componentes são renderizados quando o `counter`
-é atualizado, quando somente o componente `ShowCounter` utiliza o valor.
+You may have noticed that all components are re-rendered when the `counter` is updated, even though only the `ShowCounter` component uses the value.
 
-Nesse caso podemos utilizar a <a rel="noreferrer noopener" target="_blank" href="https://kentcdodds.com/blog/how-to-optimize-your-context-value">otimização recomendada pelo Kent</a>
-ou a biblioteca que quero introduzir nesse artigo, a <a rel="noreferrer noopener" target="_blank" href="https://github.com/dai-shi/use-context-selector">use-context-selector</a>,
-a otimização
-citada pelo Kent de separar o valor do `handler` que atualiza esse valor em diferentes
-contextos funciona em grande parte dos casos, mas para utilizar a Context API de
-uma forma mais completa com uma API limpa, essa biblioteca é sensacional.
+In this case, we can use the <a rel="noreferrer noopener" target="_blank" href="https://kentcdodds.com/blog/how-to-optimize-your-context-value">optimization recommended by Kent</a> or the library I want to introduce in this article, <a rel="noreferrer noopener" target="_blank" href="https://github.com/dai-shi/use-context-selector">use-context-selector</a>. While separating the value from the handler that updates it into different contexts works in many cases, this library is fantastic for using the Context API more comprehensively with a clean API.
 
-## Utilizando use-context-selector
+## Using use-context-selector
 
-A declaração do contexto não é muito diferente, só muda que utilizamos
-a função fornecida pela biblioteca.
+The declaration of the context is not much different, it just changes that we use the function provided by the library.
 
 ```tsx
 import { ReactNode, useCallback, useState } from 'react'
@@ -276,9 +248,7 @@ const CounterProvider = ({ children }: { children: ReactNode }) => {
 export { CounterProvider, counterContext }
 ```
 
-Agora a maior diferença fica na hora de utilizarmos o Context criado, ainda podemos
-consumir o contexto com o hook `useContext` fornecido pela biblioteca, mas o motivo
-de estarmos utilizando ela é o hook `useContextSelector`.
+Now the biggest difference comes when we use the created Context. We can still consume the context with the `useContext` hook provided by the library, but the reason we are using it is the `useContextSelector` hook.
 
 ```tsx
 import { useContextSelector } from 'use-context-selector'
@@ -300,14 +270,9 @@ export const ShowCounter = () => {
 }
 ```
 
-Primeiro passamos o contexto que será utilizado e como segundo parâmetro do hook
-um `handler`, nesse `handler` o parâmetro que recebemos é o valor do contexto em si,
-então posso desestruturar, fazer qualquer tratativa e então retornar o valor
-que eu quiser para o componente com base nos valores do contexto, nesse caso
-peguei o `counter` e só retornei o valor.
+First, we pass the context that will be used and as a second parameter of the hook a `handler`, in this `handler` the parameter we receive is the value of the context itself, so I can destructure, do any processing and then return the value that I want for the component based on the values of the context, in this case I took the `counter` and just returned the value.
 
-Exemplo de alterações que podem ser feitas pensando que existe um carrinho de
-compras no contexto:
+Example of changes that can be made considering there is a shopping cart in the context:
 
 ```tsx
 const cartInfos = useContextSelector(myContext, ({ cart }) => {
@@ -320,12 +285,9 @@ const cartInfos = useContextSelector(myContext, ({ cart }) => {
 })
 ```
 
-Por conta desse `hook` e os recursos fornecidos acho muito interessante utilizar
-essa biblioteca quando pensamos em escalar uma aplicação utilizando a Context API.
+Because of this `hook` and the resources provided, I find it very interesting to use this library when we think about scaling an application using the Context API.
 
-Agora voltando ao exemplo, os outros componentes de incrementar e decrementar o
-`counter` serão iguais aos anteriores alterando só a forma com que consumimos o valor
-do contexto.
+Now going back to the example, the other components to increment and decrement the `counter` will be the same as the previous ones, changing only the way we consume the value from the context.
 
 ```tsx
 // ...same imports
@@ -371,8 +333,7 @@ export const DecrementCounter = () => {
 }
 ```
 
-E agora hora de testar, será que esse hook fornece somente uma forma mais detalhada
-de consumirmos os valores de um contexto ou realmente interfere na performance?
+And now it's time to test it, does this hook provide only a more detailed way to consume context values or does it actually impact performance?
 
 <iframe
   loading="lazy"
@@ -383,10 +344,9 @@ de consumirmos os valores de um contexto ou realmente interfere na performance?
   sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
 ></iframe>
 
-Somente os componentes que utilizam os valores que são atualizados sofrem novas
-renderizações!
+Only the components that use the updated values are re-rendered!
 
-Versão final com os dois exemplos:
+Final version with both examples:
 
 <iframe
   loading="lazy"
@@ -397,17 +357,8 @@ Versão final com os dois exemplos:
   sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
 ></iframe>
 
-## Conclusão
+## Conclusion
 
-Inicialmente a Context API não era recomendada para gerenciar os estados de grandes
-aplicações, mas olhando o futuro daquela Pull Request, as otimizações citadas
-pelo Kent e a biblioteca que mostrei, é sim possível organizar contextos e
-escalar uma aplicação utilizando só a Context API para gerenciar esses estados.
+Initially, the Context API was not recommended for managing the state of large applications, but looking at the future of that Pull Request, the optimizations mentioned by Kent and the library I showed, it is indeed possible to organize contexts and scale an application using only the Context API to manage these states.
 
-E para finalizar, não sou contra nenhuma outra biblioteca para gerenciar estados,
-ultimamente tenho olhado bastante para <a rel="noreferrer noopener" target="_blank" href="https://recoiljs.org">Recoil</a>
-e <a rel="noreferrer noopener" target="_blank" href="https://github.com/pmndrs/jotai">jotai</a>,
-ambas resolvem essa questão de gerenciar estados de uma forma limpa, com uma API
-enchuta e boa de se utilizar, caso você utilize GraphQL e como client o Apollo
-também recomendo olhar as <a rel="noreferrer noopener" target="_blank" href="https://www.apollographql.com/docs/react/local-state/reactive-variables/">Reactive Variables</a>,
-combinado com o cache é simplesmente poderoso.
+And to conclude, I am not against any other library for managing states, lately I have been looking a lot at <a rel="noreferrer noopener" target="_blank" href="https://recoiljs.org">Recoil</a> and <a rel="noreferrer noopener" target="_blank" href="https://github.com/pmndrs/jotai">jotai</a>, both solve this issue of managing states in a clean way, with a neat API and easy to use. If you use GraphQL and Apollo client, I also recommend looking at <a rel="noreferrer noopener" target="_blank" href="https://www.apollographql.com/docs/react/local-state/reactive-variables/">Reactive Variables</a>, combined with the cache it is simply powerful.

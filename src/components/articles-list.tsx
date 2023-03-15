@@ -1,4 +1,6 @@
+import { localizePath } from 'astro-i18next'
 import type { CollectionEntry } from 'astro:content'
+import i18next from 'i18next'
 import { formatDate } from '../utils/formatDate'
 
 interface ArticlesListProps {
@@ -17,7 +19,7 @@ export const ArticlesList = ({ articles }: ArticlesListProps) => {
       {articles.map((article) => (
         <div key={article.data.title} className="mt-auto h-full">
           <a
-            href={`/blog/${article.slug}`}
+            href={localizePath(`/blog/${article.slug}`)}
             className="no-underline flex flex-col h-full hover:opacity-80"
           >
             <img
@@ -28,8 +30,11 @@ export const ArticlesList = ({ articles }: ArticlesListProps) => {
               className="h-auto object-cover block rounded-md transition-[box-shadow 0.1s]"
             />
             <p className="text-gray-500 dark:text-gray-300 my-2">
-              {formatDate(new Date(article.data.pubDate), 'pt')} —
-              {` ${article.data.minutesRead}`}
+              {formatDate(
+                new Date(article.data.pubDate),
+                i18next.language as 'pt' | 'en'
+              )}{' '}
+              —{` ${article.data.minutesRead}`}
             </p>
             <h3 className="text-3xl text-start">{article.data.title}</h3>
           </a>

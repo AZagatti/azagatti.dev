@@ -1,17 +1,13 @@
 ---
 title: Layout - Header, Main, Footer
-pubDate: "2020-08-17T03:00:00Z"
-description: "Explicando um Layout simples para páginas com header, main e footer"
+pubDate: '2020-08-17T03:00:00Z'
+description: 'Explicando um Layout simples para páginas com header, main e footer'
 tags: [html, css, layout]
 keywords: [html, css, layout]
 heroImage: '/img/layout.jpeg'
 ---
 
-<img
-  src="/img/layout.jpeg"
-  alt="Layout - Header, Main, Footer"
-  
-/>
+<img src="/img/layout.jpeg" alt="Layout - Header, Main, Footer" />
 
 ---
 
@@ -21,21 +17,17 @@ Um amigo precisou de uma ajuda para posicionar o Footer sempre no fim da página
 
 ```html
 <div class="container">
-  <header>
-    Teste
-  </header>
+  <header>Teste</header>
   <main>
-    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Esse ut modi
-    non commodi, dolorem expedita atque eos explicabo omnis doloremque illo,
+    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Esse ut modi non
+    commodi, dolorem expedita atque eos explicabo omnis doloremque illo,
     nesciunt nulla delectus, id molestias! Necessitatibus non illum fugiat.
   </main>
-  <footer>
-    Copyright 2020
-  </footer>
+  <footer>Copyright 2020</footer>
 </div>
 ```
 
-Na estrutura de HTML acima está um layout padrão em várias páginas, mas e como fazer o `main` ocupar toda a área da tela menos a àrea do `header` e do `footer`?
+Na estrutura de HTML acima está um layout padrão em várias páginas, mas e como fazer o `main` ocupar toda a área da tela menos a area do `header` e do `footer`?
 
 ```css
 * {
@@ -74,9 +66,9 @@ footer {
 }
 ```
 
-Antes do `.container` são somente alguns resets* de CSS e regular a altura do `html` e do `body` em pelo menos 100% da tela.
+Antes do `.container` são somente alguns resets\* de CSS e regular a altura do `html` e do `body` em pelo menos 100% da tela.
 
-\**Reset de CSS seria retirar alguns estilos padrões que já vem nativamente nas tags*
+\*_Reset de CSS seria retirar alguns estilos padrões que já vem nativamente nas tags_
 
 O que interessa está logo a baixo, adicionando o `display: flex` para o container, alinhando a direção em colunas e dizendo para ele pegar 100% da altura já é o início.
 

@@ -1,6 +1,8 @@
 ---
 import '@fontsource/nunito'
 import '@fontsource/roboto'
+import i18next from 'i18next'
+import { LanguageSelector } from 'astro-i18next/components'
 import BaseHead from '../components/BaseHead.astro'
 import { Footer } from '../components/footer'
 import { Header } from '../components/header'
@@ -15,9 +17,14 @@ const {
 } = Astro.props
 ---
 
-<html lang="pt-br">
+<html lang={i18next.language}>
   <head>
-    <BaseHead title={title} description={description} image={image} isPost={isPost} />
+    <BaseHead
+      title={title}
+      description={description}
+      image={image}
+      isPost={isPost}
+    />
   </head>
 
   <body>
@@ -25,7 +32,13 @@ const {
       class="w-full flex items-center justify-center flex-col dark:bg-gray-800"
     >
       <Header>
-        <ToggleThemeBtn client:only />
+        <LanguageSelector
+          showFlag
+          class="text-gray-500 dark:text-gray-300 dark:bg-gray-800"
+        />
+        <div class="min-w-[24px] min-h-[24px] ml-4">
+          <ToggleThemeBtn client:idle />
+        </div>
       </Header>
       <slot />
       <Footer />

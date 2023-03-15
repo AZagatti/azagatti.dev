@@ -12,12 +12,7 @@ export interface Props {
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site)
 
-const {
-  title,
-  description,
-  image = '/logo.jpg',
-  isPost,
-} = Astro.props
+const { title, description, image = '/logo.jpg', isPost } = Astro.props
 ---
 
 <!-- Global Metadata -->
@@ -101,5 +96,17 @@ const {
     document.documentElement.classList.remove(Themes.Dark)
   } else {
     document.documentElement.classList.add(Themes.Dark)
+  }
+</script>
+
+<script>
+  const isBlogHome = location.pathname.endsWith('/blog')
+  const isEnglish = document.querySelector<HTMLElement>('html')!.lang === 'en'
+  const isPostEnglish = location.pathname.endsWith('/en')
+  if (!isBlogHome && isEnglish && !isPostEnglish) {
+    location.pathname = `${location.pathname}/en`
+  }
+  if (!isBlogHome && !isEnglish && isPostEnglish) {
+    location.pathname = location.pathname.substring(0, location.pathname.length - 3)
   }
 </script>

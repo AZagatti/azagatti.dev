@@ -1,0 +1,273 @@
+---
+title: Typescript and its use in React
+pubDate: '2021-02-18T03:00:00Z'
+description: 'A little Typescript and its application in React'
+tags: [javascript, react, typescript, frontend]
+keywords: [javascript, react, typescript, frontend]
+heroImage: '/img/typescript-and-react.jpeg'
+---
+
+<img
+  src="/img/typescript-and-react.jpeg"
+  alt="Typescript and its use in React"
+/>
+
+---
+
+## Typescript
+
+[Typescript](https://www.typescriptlang.org/) is a JavaScript superset that adds types.
+adding types, some people call it a language, but it doesn't change the fact that all
+code in Javascript is valid code in Typescript.
+
+## Typesetting
+
+Typesetting is what made Typescript so attractive. Javascript, by having dynamic
+shines in the eyes of many devs, making it easy to get started in the language,
+but when we fall into more complex cases and larger code bases this dynamic typing
+dynamic typing ends up hindering the understanding of the code and not bringing reliability.
+
+Now bringing practical examples, if we try to do something like:
+
+```ts
+let firstName = 'André'
+
+firstName = 0
+```
+
+We'll get the error: `Type 'number' is not assignable to type 'string'.(2322)`
+even if you don't tell it that the variable `firstName` is a `string`, Typescript has
+to infer the type, so when we try to reassign a `number`, the
+the compiler generates a type error, making the variables more reliable.
+
+## Complex Types
+
+When we work with Javascript it is quite common to use `Arrays` and `Objects`.
+For these cases there are several typing options, the most common being
+[interface](https://www.typescriptlang.org/docs/handbook/interfaces.html) and
+type aliases.
+
+Using the previous example, you can create type aliases for the variable
+``firstName`, stating that it can be assigned a number.
+
+```ts
+type NameOrYear = number | string
+
+let firstName: NameOrYear = ``Andres''
+
+firstName = 0
+```
+
+The declaration could be directly `let firstName: number | string = 'André'`
+but using type aliases makes the typing clearer, more organized, and can be
+reused.
+
+Now speaking of the most used structure in JavaScript, which is the `Object`, we can
+we can use the interfaces to have a reliability of what we expect in the variable
+variable of that type.
+
+```ts
+interface PersonalInfos {
+  name: string
+  age: number
+  hobbies: Array<string>
+}
+
+const zagatti: PersonalInfos = {}
+```
+
+Before I comment further on the code, I must make a parenthesis for the
+of the `hobbies`. There are two ways to declare an array of types, being for example
+`string[]` and as I declared `Array<string>`. These minus and plus signs mean
+that the `Array` type expects a
+[generics](https://www.typescriptlang.org/docs/handbook/generics.html), which is nothing more
+is just passing it a type to let it know what the structure of the array is, and it can
+It can receive other types as an interface that defines an object.
+
+After this parenthesis I have to say that the above code will cause an error (
+`Type '{}' is missing the following properties from type 'PersonalInfos': name, age, hobbies(2739)`
+), because the
+Typescript compiler expects the variable `zagatti` to start with the fields
+fields with the correct typeface, adjusting the initialization should be something
+like:
+
+```ts
+const zagatti: PersonalInfos = {
+  name: 'André',
+  age: 23,
+  hobbies: ['Programar', 'Tomar café'],
+}
+```
+
+But there is also a way to force typing of the empty object (`Type Assertion`)
+using the word `as`, so it would look like this:
+
+```ts
+const zagatti: PersonalInfos = {} as PersonalInfos
+```
+
+One point of caution is to use this type statement with care so that you don't end up
+not trying to access values that don't exist and appear to exist because of the
+`Type Assertion`.
+
+We can also inform you that some fields are optional, and to do this we declare
+the field with `?:`
+
+```ts
+interface PersonalInfos {
+  name: string
+  age?: number
+  hobbies?: Array<string>
+}
+
+const zagatti: PersonalInfos = { name: 'André' }
+```
+
+This way there will be no error, because the compiler understands that only the
+`name` key is expected when initializing a variable with type `PersonalInfos`.
+
+I think I've got most of the basics down, but there is a lot more to this superscript.
+Typescript, there is much more inside this superset, a feature
+feature that I recommend you look at is the
+[Utility Types](https://www.typescriptlang.org/docs/handbook/utility-types.html)
+and all of its documentation.
+
+## Typescript in React
+
+In React we always look for reliability when passing `props` from one
+component to another, so for a long time we used a package called
+`prop-types` where we could define a type for the `props` that a component but
+the reliability was only the errors that happened when the project was running,
+Typescript went further by bringing in the errors at development time and also with the
+Typescript has gone further with the reliability of types in `states`, external
+functions, and much more.
+
+Imagine a component that gets a name by `prop`, does a search and gets the
+surname and age, in Javascript the component would look something like:
+
+```jsx
+import { useEffect, useState } from 'react'
+
+export const Main = ({ name, children }) => {
+  const [data, setData] = useState()
+
+  useEffect(() => {
+    // api call
+    setData({
+      lastName: 'Zagatti',
+      age: 23,
+    })
+  }, [])
+
+  return (
+    <div>
+      <h1>{`${name} ${data?.lastName} - ${data?.age}`}</h1>
+      {children}
+    </div>
+  )
+}
+```
+
+Looking at it this way it may seem a bit obvious that `name` is a `string`, `children`
+are the child tags of the `Main` component and the state `data` has a `lastName`
+and `age` fields, but when using the component it is not required to pass the prop
+`name` causing a `undefined` screen, we can handle it with the `||` operator in h1
+but there can be N problems with people not understanding which field expects what.
+
+Now the same component declared with Typescript would look like this:
+
+```tsx
+import { ReactNode, useEffect, useState } from 'react'
+
+interface Data {
+  lastName: string
+  age: number
+}
+
+interface MainProps {
+  name: string
+  children?: ReactNode
+}
+
+export const Main = ({ name, children }: MainProps) => {
+  const [data, setData] = useState<Data>()
+
+  useEffect(() => {
+    // api call
+    setData({
+      lastName: 'Zagatti',
+      age: 23,
+    })
+  }, [])
+
+  return (
+    <div>
+      <h1>{`${name} ${data?.lastName} - ${data?.age}`}</h1>
+      {children}
+    </div>
+  )
+}
+```
+
+Hmm, more verbose correct?! Maybe so, but much clearer and more obvious than what to do
+with the component, now if we use the component in another `.tsx` file and
+and don't pass the prop `name` we get the type error
+`Type '{}' is missing the following properties from type 'MainProps': name ts(2739)`
+which is wonderful, we know that for the component to work as it did we need to
+we need to pass the correct `props`, and we also have the intelligence in the development, the
+IntelliSense.
+
+Everything I showed before about Typescript also applies in the React context,
+that is, if you try to assign an object with different fields to the `data` state
+state, a type error will occur. Besides useState there are many other uses
+of Typescript with parts of React, such as this Input component:
+
+```tsx
+import { ComponentType, InputHTMLAttributes } from 'react'
+import { IconBaseProps } from 'react-icons'
+
+import { Container } from './styles'
+
+interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+  isErrored?: boolean
+  icon?: ComponentType<IconBaseProps>
+}
+
+export const Input = ({
+  isErrored,
+  icon: Icon,
+  children,
+  className,
+  name,
+  ...rest
+}: InputProps) => {
+  return (
+    <Container className={className} isErrored={isErrored}>
+      {Icon && <Icon size={20} />}
+      {children}
+      {!children && (
+        <label htmlFor={name}>
+          <input name={name} {...rest} />
+        </label>
+      )}
+    </Container>
+  )
+}
+```
+
+It may seem complex at first, but an interface can extend an existing one
+which in this case are the attributes of the `input` tag. With Typescript we have the
+with Typescript we have the confidence to create complex components and be sure that all the data
+for example the prop `Icon` which is an icon component from the `react-icons` library.
+
+## Conclusion
+
+At the end of this post I can only say that there is a much bigger world around
+Typescript and its use in the frontend world, and in the past example in
+React.
+
+I recommend using Typescript as much as you can, there comes a time
+that it becomes natural to work with this tool and there is no reason not to
+not to use the features that this superset provides, one day or another you end up
+edge case in the project that would be great if a type system was available in it.
+type system was available in it.

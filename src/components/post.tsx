@@ -1,3 +1,4 @@
+import i18next from 'i18next'
 import { formatDate } from '../utils/formatDate'
 
 interface PostProps {
@@ -11,7 +12,7 @@ export const Post = ({ children, post }: PostProps) => {
       <h2 className="text-3xl font-bold">{post.title}</h2>
       <p className="text-base font-normal pb-8 pt-2 text-gray-500 dark:text-gray-300">{`${formatDate(
         new Date(post.pubDate),
-        'pt'
+        i18next.language as 'pt' | 'en'
       )} — ${post.minutesRead}`}</p>
       <div className="markdown md:max-w-4xl">{children}</div>
     </article>

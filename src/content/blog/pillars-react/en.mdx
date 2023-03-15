@@ -1,0 +1,259 @@
+---
+title: The Pillars of React
+pubDate: '2020-08-18T03:00:00Z'
+description: 'Explaining the pillars of React'
+tags: [javascript, react]
+keywords: [javascript, react, state, props, efeito]
+heroImage: '/img/pillars-react.jpeg'
+---
+
+<img
+  src="/img/pillars-react.jpeg"
+  alt="The Pillars of React"
+  
+/>
+
+---
+
+## What is React?
+
+[React](https://reactjs.org/) is a JavaScript library developed by Facebook for creating component-based interfaces, created by Jordan Walke.
+
+React follows a declarative way of programming, encapsulating logic into specific components for each part of the application.
+
+The focus of this post is to introduce the pillars needed to develop your first applications with this framework. By understanding the concept and how to use these pillars it is already possible to use most of React's features.
+
+## Introduction to JSX
+
+Consider this the first component of the application:
+
+```js
+import React from 'react';
+
+function App() {
+  return (
+    <div className="App">
+      <h1>Hello ReactJS</h1>
+    </div>
+  )
+}
+
+export default App;
+```
+
+This strange tag declaration is not a string, much less ordinary HTML.
+
+At first it may seem strange, why bundle HTML with JavaScript code? We will soon see that this way makes sense and makes it easier to develop within React, because the logic is encapsulated in the component itself.
+
+JSX is a syntax extension for JavaScript (JavaScript eXtension) based on XML (HTML syntax). Remember that the browser does not understand this syntax so it must be transpiled using for example Babel, which transforms JSX into Javascript code.
+
+The transposed code to create an empty div would look something like this:
+
+```js
+React.createElement('div', null);
+```
+
+---
+
+## Components
+
+When we work with React we use the concept of componentization, that is, we divide the UI into independent parts, reusable and allowing you to think about each part in isolation.
+
+In the past we used to use class components to work with states but today we use only functional components thanks to the "new" hooks API.
+
+```jsx
+import React from 'react';
+
+export default function Person() {
+  return <h1>The person's name is: André Zagatti</h1>;
+}
+```
+
+This function is a valid React component because it is not receiving any parameters (it can receive properties as we will see) and returns a React JSX element. These components are called functional components, because they are literally Javascript functions. One detail, whenever we use JSX syntax we must import React.
+
+```jsx
+import React from 'react';
+
+import Person from './components/Person';
+
+function App() {
+  return <Person />;
+}
+
+export default App;
+```
+
+As we saw earlier React understands HTML tags in JSX but we can also use our own components as tags.
+
+## Properties (props)
+
+The props of React components resemble attributes passed to HTML tags.
+
+```jsx
+import React from 'react';
+
+export default function Person(props) {
+  return <h1>The person's name is: {props.name}</h1>;
+}
+```
+
+Now the **Person** component is not stuck with a static name and can be reused by simply passing another name to the props.
+
+```jsx
+import React from 'react';
+
+import Person from './components/Person';
+
+function App() {
+  return (
+    <div>
+      <Person name="Solaire of Astora" />
+      <Person name="Andre of Astora" />
+      <Person name="Sigmeyer of Catarina" />
+    </div>
+  );
+}
+
+export default App;
+```
+
+When we pass data using a component's props we have to pass exactly the name that will be used within the component as the name of the prop. This passing of named data is usually called **Named/Labeled Arguments**, with JavaScript objects it is very easy to use this model.
+
+## State
+
+The state of the component is a variable that stores current information of the component, if there is a change the component and its child components will be rendered again(it is the same with props).
+
+To use state in functional components we use the "new" React API called hooks. The state hook is called `useState`, which is a function that receives the initial state and returns an array with the first position being the state value and the second a function to update this value following the concepts of [immutability](https://desenvolvedor.expert/por-que-imutabilidade-eh-importante-fd0ba22f103e?gi=6922abd860f).
+
+```jsx
+import React, { useState } from 'react';
+
+import Person from './components/Person';
+
+function App() {
+  const [name, setName] = useState('');
+  /**
+   * It is the same as
+   * const nameState = useState('');
+   * const name = nameState[0];
+   * const setName = nameState[1];
+   */
+
+  return (
+    <div>
+      <input
+        type="text"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
+      <Person name={name} />
+    </div>
+  );
+}
+
+export default App;
+```
+
+In this component we are using the state and props pillars.
+
+In more detail what the component is doing, the `[name, setName]` is an array [destructuring](https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment) available in JavaScript since ES6 where `name` references the first element of the array and `setName` references the second.
+
+On the input the `value` property is required for the value displayed on the input screen to reflect the value of the state `name`. About `onChange` is an input event that fires on each new letter typed into it, what is passed is the change event, so to take the value typed and insert it into the name state use `e.target.value`.
+
+In the `Person` component we can see that it's no longer being passed a string but a Javascript variable, so to insert Javascript into JSX we use the braces. It's interesting to note that we can share the state of a parent element to a child element, which is something that is used a lot. We can also share the state of a child element to the parent element but it's something more complex and not always necessary.
+
+## Effect Hook (useEffect)
+
+When we used class components it was common to use the life cycle methods of the component. These methods were responsible for executing functions and changing data when the component was assembled, changed, or disassembled. Today with the hooks API we use a single hook to handle these cases, called useEffect.
+
+```jsx
+import React, { useState, useEffect } from 'react';
+
+function App() {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => setCount(count + 1), 1000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [count]);
+
+  return (
+    <div>
+      <h1>{count} seconds</h1>
+    </div>
+  );
+}
+
+export default App;
+```
+
+The `useEffect` gets as first parameter a callback function with the code that will be executed when the component is mounted, the second parameter is the dependency array of the effect hook, this dependency array is the external variables used inside it and that it will watch, when there is a change in these variables it will execute again.
+
+As there is a change in the state of the component every second because of `setInterval` it is necessary to pass a `useEffect` callback so that it can clear the Interval when the component is disassembled, if this callback is not passed there will be side effects in the application as several Interval's will be running at the same time causing memory leak and changing the state repeatedly.
+
+There is an alternative syntax to using the change state function that can eliminate this repeated execution of the `useEffect` (which causes many loops) by removing the count from the dependency array.
+
+```jsx
+import React, { useState, useEffect } from 'react';
+
+function App() {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    setInterval(() => setCount((state) => state + 1), 1000);
+  }, []);
+
+  return (
+    <div>
+      <h1>{count} seconds</h1>
+    </div>
+  );
+}
+
+export default App;
+```
+
+Using a callback to change the state it is possible to retrieve the current state value and use it to create a new one. But since functions like Interval can be running in the background without us noticing, I recommend leaving the return clearing the Interval as a precaution.
+
+## Bonus
+
+As a bonus I decided to put how to make an API call. To do that we will use the effect hook and the native API for HTTP requests called fetch.
+
+```jsx
+import React, { useEffect } from 'react';
+
+export default function App() {
+  useEffect(() => {
+    (async () => {
+      const response = await fetch('https://api.github.com/users/azagatti');
+      const data = await response.json();
+      console.log(data);
+    })();
+  }, []);
+
+  return (
+    <div>
+      <h2>Fetch data!</h2>
+    </div>
+  );
+}
+```
+
+Some interesting things to note, it is not possible to directly use `async` in `useEffect`, so normally you would use the Promise syntax with `then` but we can use an IIFE (Immediately invoked function expression) to write with the `async` and `await` syntax.
+
+What to do next? Normally we would store this data returned from the API in a state and map it in `JSX` to show the data we want, we could even create new components that receive this data by `props` and take responsibility for displaying the values.
+
+## Conclusion
+
+In this post I approached what I consider the pillars for development using React, understanding how to apply each of them is already possible to develop using this framework, but this is just the beginning, there are more concepts, other hooks and several libraries used in the React ecosystem that are worth studying. For example, libraries for creating page routes, working with forms, element references and much more.
+
+For those who want to test the codes easily without creating the whole environment, you can use the code shown in the post on Codesandbox, just comment and take the comments of what you want: https://codesandbox.io/s/pensive-cache-cwohe
+
+### Sources:
+
+https://reactjs.org/ or https://pt-br.reactjs.org/
+
+https://www.youtube.com/watch?v=dpw9EHDh2bM

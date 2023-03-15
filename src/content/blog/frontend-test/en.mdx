@@ -1,0 +1,377 @@
+---
+title: Frontend testing
+pubDate: '2020-11-10T03:00:00Z'
+description: 'How to create tests on the frontend and their importance.'
+tags: [html, css, javascript, js, react, react-native, testing-library, enzyme]
+keywords:
+  [html, css, javascript, js, react, react-native, testing-library, enzyme]
+heroImage: '/img/frontend-test.jpeg'
+---
+
+<img
+  src="/img/frontend-test.jpeg"
+  alt="Frontend Testing"
+/>
+
+---
+
+## Why create tests?
+
+The first question that should come to the mind of every developer is, why create tests? When it comes to frontend development, you might often hear "Why bother creating tests when the team can test it?"
+
+Automated tests do require extra effort when developing software, but what many people fail to realize is that this effort can actually save more effort and even money in the future.
+
+How can we be sure that a change X won't break features that were already working? That's where different types of tests come in. In this article, I'll be discussing unit tests and showing how to test your React application.
+
+## Avoid implementation detail tests!
+
+When it comes to React, people often associate component tests with the `Enzyme` library. It's definitely a good library that has helped many developers test their React applications, but over time, there have been many controversies in the community about the false positives and false negatives that this testing approach provides.
+
+Since the goal is to test the implementation detail directly, when a code refactoring occurs, tests can fail, resulting in a false negative. In the case of false positives, they can appear when the detail is not tested, passing bugs through the tests.
+
+If you want more information and examples, I recommend [this article](https://kentcdodds.com/blog/testing-implementation-details) by Kent C. Dodds.
+
+## Tooling
+
+I'll briefly discuss the recommended testing tooling for React when it comes to unit tests.
+
+[Jest](https://jestjs.io/) is a complete testing framework for JavaScript, and it can be used to test frontend web, backend, mobile, and various platforms that use JS.
+
+[Testing Library](https://testing-library.com/) is a library with utilities for creating behavior-focused tests. In the example, I'll show how to use it in React, but there are versions for Vanilla JS, Vue, React Native, and others.
+
+## Creating the structure
+
+In this post, I'll be using React. If you're not familiar with it, take a look at [my other post](https://blog.azagatti.dev/pillars-react/). I'll also be using React's new Hooks API. If you're not familiar with it, read [this post](https://blog.azagatti.dev/migrate-to-hooks/).
+
+First, I'll create a simple routing structure with `react-router-dom`.
+
+```tsx
+import React from 'react'
+import { Switch, Route } from 'react-router-dom'
+
+import Home from './pages/Home'
+import List from './pages/List'
+
+const Routes = () => (
+  <Switch>
+    <Route path="/" exact component={Home} />
+    <Route path="/list" component={List} />
+  </Switch>
+)
+
+export default Routes
+```
+
+With the routing file created, I just need to call it in the App.tsx, which is the first component of the application.
+
+```tsx
+import React from 'react'
+import { BrowserRouter } from 'react-router-dom'
+
+import Routes from './routes'
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes />
+    </BrowserRouter>
+  )
+}
+```
+
+Now I'll quickly go through the two screens I created and explain the functionality of each one.
+
+```tsx
+import React, { FormEvent, useCallback, useState } from 'react'
+import { useHistory } from 'react-router-dom'
+
+const Home = () => {
+  const [name, setName] = useState('')
+  const history = useHistory()
+
+  const handleSubmit = useCallback(
+    (e: FormEvent) => {
+      e.preventDefault()
+      if (name) {
+        history.push('/list', { name })
+      }
+    },
+    [history, name]
+  )
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <label>
+        <div>User</div>
+        <input
+          placeholder="User"
+          value={name}
+          onChange={({ target }) => setName(target.value)}
+        />
+      </label>
+      <button type="submit">See repos</button>
+    </form>
+  )
+}
+
+export default Home
+```
+
+This is the initial screen, containing only one input and it's responsible for sending the value entered by the user to the screen that will list the Github repositories of the entered name.
+
+```tsx
+import React, { useEffect, useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
+import axios from 'axios'
+
+interface IRepo {
+  id: number
+  name: string
+  description: string | null
+  url: string
+  stargazers_count: number
+  forks: number
+  open_issues: number
+}
+
+const List = () => {
+  const { state } = useLocation<{ name: string } | undefined>()
+
+  const [repos, setRepos] = useState<IRepo[]>([])
+
+  useEffect(() => {
+    ;(async () => {
+      try {
+        const { data } = await axios.get(
+          `https://api.github.com/users/${state?.name}/repos`
+        )
+        setRepos(data)
+      } catch (err) {
+        console.error(err)
+      }
+    })()
+  }, [state?.name])
+
+  return (
+    <div>
+      <Link to="/">Voltar</Link>
+      <ul>
+        {repos.map((repo) => (
+          <li key={repo.id}>
+            <p>{repo.name}</p>
+            {repo?.description ? <p>{repo.description}</p> : null}
+            <div>
+              <a href={repo.url} target="_blank" rel="noreferrer noopener">
+                Link
+              </a>
+            </div>
+            <span>Stars: {repo.stargazers_count}</span> <span>
+              Forks: {repo.forks}
+            </span> <span>Issues: {repo.open_issues}</span>{' '}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+export default List
+```
+
+This screen is responsible for fetching the user's repositories using the Github API and listing them.
+
+## Testing
+
+Now let's get to the important part of the post, creating the first tests.
+
+To create the test file, we can use the extension `File.test.tsx` or `File.spec.tsx`. In the case of unit tests, I usually use `spec` as the extension.
+
+In this first test, I can already explain why I created the routing between pages for this example. It was to show how to make [mocks](https://en.wikipedia.org/wiki/Mock_object) of libraries.
+
+To start the test, we usually use `describe` to inform a suite of tests, i.e., a block that will test the same function, object, or component in various ways. Inside this `describe`, we have various syntaxes for creating tests. The one I use the most, and a large part of the community as well, is `it`, which could be replaced by `test`. However, when we write what should happen in the test, `it` becomes more semantic, as in this example: "Should go to the List page".
+
+```tsx
+describe('Home', () => {
+  it('should go to List Page', () => {
+    // implementation
+  })
+})
+```
+
+After creating the test structure using Jest syntax, we use the `render` function from testing-library to render our component that will be tested. With the component inside the `render` function, we can use [destructuring](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment) to get the `getByPlaceholderText` and `getByText` functions that are used to select elements that were rendered from the component in the `render` function.
+
+```tsx
+import React from 'react'
+import { render } from '@testing-library/react'
+
+import Home from './Home'
+
+describe('Home', () => {
+  it('should go to List page', () => {
+    const { getByPlaceholderText, getByText } = render(<Home />)
+
+    // implementation
+  })
+})
+```
+
+To trigger DOM events in the test, we import the `fireEvent` function from the testing-library and use the `change` event to change the input value. We have to follow the event structure, so it is an object with a `target` key, which is another object with a `value` key and the input value. Also, with `fireEvent`, we trigger a `click` on the button, which would be the behavior of going to the List page with the value entered in the input.
+
+```tsx
+import React from 'react'
+import { render, fireEvent } from '@testing-library/react'
+
+import Home from './Home'
+
+describe('Home', () => {
+  it('should go to List page', () => {
+    const { getByPlaceholderText, getByText } = render(<Home />)
+
+    fireEvent.change(getByPlaceholderText('User'), {
+      target: { value: 'azagatti' },
+    })
+    fireEvent.click(getByText('Ver repos'))
+  })
+})
+```
+
+To know whether the test passed or not, we add the expect function. Inside it, as the first parameter, we add any value that will be compared with the Matcher, which is the chained function of expect. In the first expect, it is expected that the input with the placeholder User has the value passed in the event, in this case azagatti.
+
+```tsx
+import React from 'react'
+import { render, fireEvent } from '@testing-library/react'
+
+import Home from './Home'
+
+describe('Home', () => {
+  it('should go to List page', () => {
+    const { getByPlaceholderText, getByText } = render(<Home />)
+
+    fireEvent.change(getByPlaceholderText('User'), {
+      target: { value: 'azagatti' },
+    })
+    fireEvent.click(getByText('Ver repos'))
+
+    expect(getByPlaceholderText('User')).toHaveDisplayValue('azagatti')
+  })
+})
+```
+
+The test seems ready, but an error will occur if you run it, if we analyze the page closely, it is being rendered outside the routes and uses a hook and a method from that hook to go to another page, and that's where the mock comes in.
+
+There are several ways to mock with `Jest`. For libraries, I find it easier to use a `mock` function that is called with the global variable `jest` itself. As the first parameter, we pass the name of the module(library) that will be mocked and then what this library will return. The `react-router-dom` library itself returns many things, but what I'm interested in, which is used on the page, is the `useHistory` hook, so I just need to mock its implementation.
+
+I know that `useHistory` is a function that returns an object that has several functions and again, I only need to mock what I use, in this case the `push` function. To mock a function, we can add only an empty function(() => {}) or if we want to monitor it, we can create a variable with `jest.fn()` and pass it to the function we want to monitor. Since I have access to the function that should be used on the button click, I can add another `expect` and the `Matcher` as `toBeCalled` which checks if the function in the `expect` parameter was called.
+
+```tsx
+import React from 'react'
+import { render, fireEvent } from '@testing-library/react'
+
+import Home from './Home'
+
+const mockedHistoryPush = jest.fn()
+
+jest.mock('react-router-dom', () => {
+  return {
+    useHistory: () => ({
+      push: mockedHistoryPush,
+    }),
+  }
+})
+
+describe('Home', () => {
+  it('should go to List page', () => {
+    const { getByPlaceholderText, getByText } = render(<Home />)
+
+    fireEvent.change(getByPlaceholderText('User'), {
+      target: { value: 'azagatti' },
+    })
+    fireEvent.click(getByText('Ver repos'))
+
+    expect(getByPlaceholderText('User')).toHaveDisplayValue('azagatti')
+    expect(mockedHistoryPush).toBeCalled()
+  })
+})
+```
+
+This is a simple test, but with it, I was able to explain many of the concepts used to create tests in React.
+
+With most of the concepts already explained, in the test of the `List` page, I will focus on the new concepts.
+
+```tsx
+import React from 'react'
+import { render, waitFor } from '@testing-library/react'
+import axios from 'axios'
+import MockAdapter from 'axios-mock-adapter'
+
+import List from './List'
+
+const apiMock = new MockAdapter(axios)
+
+const mocksRepos = [
+  {
+    id: 1,
+    name: 'Repo01',
+    description: 'Description01',
+    url: 'about:blank',
+    stargazers_count: '1',
+    forks: '2',
+    open_issues: '3',
+  },
+  {
+    id: 2,
+    name: 'Repo02',
+    description: 'Description02',
+    url: 'about:blank',
+    stargazers_count: '4',
+    forks: '5',
+    open_issues: '6',
+  },
+]
+
+jest.mock('react-router-dom', () => {
+  return {
+    useLocation: () => ({
+      pathname: '/list',
+      state: { name: 'azagatti' },
+    }),
+    Link: ({ children }: { children: React.ReactNode }) => children,
+  }
+})
+
+describe('List', () => {
+  it('should load repos', async () => {
+    apiMock
+      .onGet('https://api.github.com/users/azagatti/repos')
+      .reply(200, mocksRepos)
+    const { getByText } = render(<List />)
+
+    await waitFor(() => {
+      expect(getByText('Repo01')).toBeInTheDocument()
+      expect(getByText('Repo02')).toBeInTheDocument()
+    })
+  })
+})
+```
+
+Another library? axios-mock-adapter? Yes, it is used to facilitate the creation of mocks with `axios`. If you are using fetch, there is [this package](https://www.npmjs.com/package/fetch-mock) and many others. [Where I work](https://www.linkedin.com/company/zedelivery/), we use [GraphQL](https://graphql.org/) with the library [Apollo Client](https://www.apollographql.com/docs/) and the library itself provides a way to [mock the calls.](https://www.apollographql.com/docs/react/development-testing/testing/#an-introduction)
+
+In this test, the `react-router-dom` library is mocked again, but this time what is used on the page is the `useLocation` hook and the `Link` component. Again, the hook is a function and from it, I want the state that would be sent by the Home page. The `Link` component uses children as the text or element that is displayed, so I create a function that only returns this text, without implementation.
+
+The API mock part is something that can be found in the documentation of each tool, in the case of `axios-mock-adapter` I need to create a variable that receives the class of the library and as a parameter of this class, the axios instance. With the variable, I can specify the route and its return, in this test, I returned the status 200 and the mockRepos array declared at the top with the same format used on the page.
+
+In the `expect` part, I used a function from `testing-library` to wait for the element with the text I informed to be in the DOM. As the API call is asynchronous, if I don't use the `waitFor` function, an error will occur because at the time of the component's first render, these texts will not yet be on the screen.
+
+Repository with the code: https://github.com/AZagatti/post-tests
+
+## Conclusion
+
+At first, creating tests can delay development and not explicitly show the advantage of creating those tests, but as the application grows or is a small but very important application, it is essential to have that confidence in developing knowing that new code will not affect the functionality of the old one and cover various situations that can happen with the component.
+
+My opinion is that whenever there is a vision of growth or importance for the application, tests should be created. It is a habit that becomes more familiar and common with practice. I really recommend studying more about the subject.
+
+### Recommended content
+
+Kent C. Dodds: https://kentcdodds.com/blog/write-tests
+
+Robin Wieruch: https://www.robinwieruch.de/react-testing-library

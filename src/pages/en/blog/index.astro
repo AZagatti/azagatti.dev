@@ -1,10 +1,10 @@
 ---
 import { getCollection } from 'astro:content'
 import i18next, { changeLanguage } from 'i18next'
-import { ArticlesList } from '../../components/articles-list'
-import BaseLayout from '../../layouts/BaseLayout.astro'
+import { ArticlesList } from '../../../components/articles-list'
+import BaseLayout from '../../../layouts/BaseLayout.astro'
 
-changeLanguage('pt')
+changeLanguage('en')
 
 const collection = await getCollection('blog', ({ id }) => {
   if (i18next.language === 'pt') {

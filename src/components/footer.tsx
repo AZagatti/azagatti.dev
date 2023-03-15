@@ -1,8 +1,12 @@
+import { useTranslation } from 'react-i18next'
+
 import { GithubIcon } from './icons/github'
 import { LinkedinIcon } from './icons/linkedin'
 import { TwitterIcon } from './icons/twitter'
 
 export const Footer = () => {
+  const { t } = useTranslation()
+
   return (
     <>
       <hr />
@@ -10,11 +14,8 @@ export const Footer = () => {
         <div className="md:max-w-6xl px-4 xl:px-0 flex-1">
           <div className="flex gap-8 justify-between flex-col md:flex-row">
             <div className="flex-1">
-              <h4 className="text-xl mb-8">André Zagatti</h4>
-              <p className="text-lg">
-                Engenheiro de software frontend que gosta de compartilhar
-                conhecimento
-              </p>
+              <h4 className="text-xl mb-8">{t('name')}</h4>
+              <p className="text-lg">{t('footer.description')}</p>
             </div>
             <div className="flex-1">
               <div className="flex md:justify-end mb-8">
@@ -23,7 +24,7 @@ export const Footer = () => {
                   target="_blank"
                   rel="noreferrer noopener"
                   href="https://github.com/azagatti"
-                  aria-label="Check my Github"
+                  aria-label={t('footer.aria.github')!}
                 >
                   <GithubIcon />
                 </a>
@@ -32,7 +33,7 @@ export const Footer = () => {
                   target="_blank"
                   rel="noreferrer noopener"
                   href="https://www.linkedin.com/in/andre-zagatti/"
-                  aria-label="Check my Linkedin"
+                  aria-label={t('footer.aria.linkedin')!}
                 >
                   <LinkedinIcon />
                 </a>
@@ -41,7 +42,7 @@ export const Footer = () => {
                   target="_blank"
                   rel="noreferrer noopener"
                   href="https://twitter.com/andre-zagatti/"
-                  aria-label="Check my Twitter"
+                  aria-label={t('footer.aria.twitter')!}
                 >
                   <TwitterIcon />
                 </a>
@@ -57,7 +58,7 @@ export const Footer = () => {
             </div>
           </div>
           <p className="mt-16 mb-8 text-base">
-            © {new Date().getFullYear()}, André Zagatti
+            {t('footer.year', { year: new Date().getFullYear() })}
           </p>
         </div>
       </div>

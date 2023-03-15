@@ -10,7 +10,6 @@ heroImage: '/img/typescript-and-react.jpeg'
 <img
   src="/img/typescript-and-react.jpeg"
   alt="Typescript e sua utilização no React"
-  
 />
 
 ---
@@ -31,9 +30,9 @@ dinâmica acaba atrapalhando o entendimento do código e não trazendo confiabil
 Agora trazendo exemplos práticos, se tentarmos fazer algo como:
 
 ```ts
-let firstName = 'André';
+let firstName = 'André'
 
-firstName = 0;
+firstName = 0
 ```
 
 Teremos o erro: `Type 'number' is not assignable to type 'string'.(2322)`
@@ -52,11 +51,11 @@ Utilizando o exemplo anterior é possível criar um type alises pra variável
 `firstName` informando que ela pode receber um número.
 
 ```ts
-type NameOrYear = number | string;
+type NameOrYear = number | string
 
-let firstName: NameOrYear = 'André';
+let firstName: NameOrYear = 'André'
 
-firstName = 0;
+firstName = 0
 ```
 
 A declaração poderia ser diretamente `let firstName: number | string = 'André'`
@@ -69,12 +68,12 @@ daquele tipo.
 
 ```ts
 interface PersonalInfos {
-  name: string;
-  age: number;
-  hobbies: Array<string>;
+  name: string
+  age: number
+  hobbies: Array<string>
 }
 
-const zagatti: PersonalInfos = {};
+const zagatti: PersonalInfos = {}
 ```
 
 Antes de comentar mais sobre o código, devo fazer um parenteses para a declaração
@@ -97,14 +96,14 @@ const zagatti: PersonalInfos = {
   name: 'André',
   age: 23,
   hobbies: ['Programar', 'Tomar café'],
-};
+}
 ```
 
 Mas também existe uma forma de forçar a tipagem do objeto vazio(`Type Assertion`)
 utilizando a palavra `as`, então ficaria:
 
 ```ts
-const zagatti: PersonalInfos = {} as PersonalInfos;
+const zagatti: PersonalInfos = {} as PersonalInfos
 ```
 
 Um ponto de atenção é utilizar essa afirmação de tipos com cuidado para acabar
@@ -116,12 +115,12 @@ o campo com `?:`
 
 ```ts
 interface PersonalInfos {
-  name: string;
-  age?: number;
-  hobbies?: Array<string>;
+  name: string
+  age?: number
+  hobbies?: Array<string>
 }
 
-const zagatti: PersonalInfos = { name: 'André' };
+const zagatti: PersonalInfos = { name: 'André' }
 ```
 
 Assim não teremos nenhum erro, pois o compilador entende que somente a chave
@@ -146,26 +145,26 @@ Imaginemos um componente que recebe um nome por `prop`, faz uma busca e traz o
 sobrenome e a idade dessa pessoa, em Javascript o componente seria algo como:
 
 ```jsx
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react'
 
 export const Main = ({ name, children }) => {
-  const [data, setData] = useState();
+  const [data, setData] = useState()
 
   useEffect(() => {
     // api call
     setData({
       lastName: 'Zagatti',
       age: 23,
-    });
-  }, []);
+    })
+  }, [])
 
   return (
     <div>
       <h1>{`${name} ${data?.lastName} - ${data?.age}`}</h1>
       {children}
     </div>
-  );
-};
+  )
+}
 ```
 
 Olhando assim pode parecer um pouco óbvio que `name` é uma `string`, `children`
@@ -177,36 +176,36 @@ mas podem acontecer N problemas de pessoas não entenderem qual campo espera o q
 Agora o mesmo componente declarado com o Typescript ficaria:
 
 ```tsx
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react'
 
 interface Data {
-  lastName: string;
-  age: number;
+  lastName: string
+  age: number
 }
 
 interface MainProps {
-  name: string;
-  children?: ReactNode;
+  name: string
+  children?: ReactNode
 }
 
 export const Main = ({ name, children }: MainProps) => {
-  const [data, setData] = useState<Data>();
+  const [data, setData] = useState<Data>()
 
   useEffect(() => {
     // api call
     setData({
       lastName: 'Zagatti',
       age: 23,
-    });
-  }, []);
+    })
+  }, [])
 
   return (
     <div>
       <h1>{`${name} ${data?.lastName} - ${data?.age}`}</h1>
       {children}
     </div>
-  );
-};
+  )
+}
 ```
 
 Hmm, mais verboso correto?! Talvez sim, mas muito mais claro e óbvio do que fazer
@@ -223,14 +222,14 @@ vai acontecer um erro de tipos. Além do useState existem muitas outras utiliza�
 do Typescript com partes do React, como por exemplo esse componente de Input:
 
 ```tsx
-import { ComponentType, InputHTMLAttributes } from 'react';
-import { IconBaseProps } from 'react-icons';
+import { ComponentType, InputHTMLAttributes } from 'react'
+import { IconBaseProps } from 'react-icons'
 
-import { Container } from './styles';
+import { Container } from './styles'
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
-  isErrored?: boolean;
-  icon?: ComponentType<IconBaseProps>;
+  isErrored?: boolean
+  icon?: ComponentType<IconBaseProps>
 }
 
 export const Input = ({
@@ -251,8 +250,8 @@ export const Input = ({
         </label>
       )}
     </Container>
-  );
-};
+  )
+}
 ```
 
 Pode parecer complexo de início mas uma interface pode extender uma já existente

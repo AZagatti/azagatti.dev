@@ -1,0 +1,241 @@
+---
+title: Asynchronous JavaScript
+pubDate: '2022-02-23T03:00:00Z'
+description: 'More details on how asynchronous features work in JavaScript.'
+tags: [javascript, async, await, callstack, eventloop, closure]
+keywords: [javascript, async, await, callstack, eventloop, closure]
+heroImage: '/img/javascript-async.jpeg'
+---
+
+<img
+  src="/img/javascript-async.jpeg"
+  alt="Asynchronous JavaScript"
+/>
+
+---
+
+## The Basics
+
+If you have been using JavaScript for a while you probably have already used asynchronous concepts
+concepts, from the famous `setTimeout`/`setInterval`, `Promise`, `async`/`await`
+and the like.
+
+First I would like to point out how JavaScript works under the
+to make it easier to understand what this asynchronicity is all about.
+
+## Event Loop and Event Queue
+
+For those who know a little more than the basics of JavaScript will have heard of the
+famous Event Loop architecture.
+
+The Event Loop is nothing more than a cyclical way of executing the actions we send to
+JavaScript, so the process is only finished when there are no more events to be
+events to be executed or for other reasons, such as an error that breaks this
+queue. An example of code for the Event Loop would look something like this:
+
+```js
+while (queue.waitForMessage()) {
+  queue.processNextMessage();
+}
+```
+
+The Event Queue is nothing more than the queue that manages the order in which these
+messages by the Event Loop, that is, if it is a queue, the first event 
+that is executed is the first to arrive in the queue, so as we are dealing with a queue
+and one message follows the other we call it synchronous code, since a message will only be
+one message will only be processed after the other.
+
+![JavaScript Async](/img/event-loop.jpeg)
+
+## Asynchronous events
+
+Well, from what I commented before, the events all happen synchronously, so how were asynchronous events handled?
+how were asynchronous events handled before we had high-level API's like `Promise` and
+level APIs like `Promise` and `async`/`await`? There are several ways, and one of them is very
+common to use in the browser, which is the standard `Observer`, where a `listener` is
+listens for changes to a particular event. One example is the old API for
+to make requests, the late `XMLHttpRequest`:
+
+```js
+const xmlHttp = new XMLHttpRequest();
+xmlHttp.responseType = 'json';
+const url = 'https://api.github.com/users/azagatti';
+xmlHttp.onreadystatechange = () => {
+  // other implementations
+  console.log(xmlHttp.response);
+};
+xmlHttp.open('GET', url);
+xmlHttp.send(null);
+```
+
+In this case we registered a function in the `onreadystatechange` property of the
+with the `XMLHttpRequest` instance and then, when using `send` we get
+return this data in the `response`, so all the logic for when the data is
+received should be inside this function assigned to `onreadystatechange`.
+
+Another classic example of asynchronous programming is `setTimeout`
+(and `setInterval`), where the assigned function is executed after the given time,
+but a classic exercise about this function, what is the order of execution of these
+logs? 🤔
+
+```js
+setTimeout(() => {
+  console.log('1');
+}, 0);
+console.log('2');
+```
+The order of the logs is: 2 -> 1. This is because the `setTimeout` enters the asynchronous event queue.
+events, even though the time entered is 0, the Event Queue will prioritize the
+only then will the `setTimeout` function be executed.
+
+## Promise
+
+Promise" is a broader concept than the name implies, it is a promise to wait.
+that must be expected. Since there are many ways to work with asynchronous,
+one of the best known by JavaScript users is to work with `callback`.
+There are many ways to use callbacks as well, but the most followed pattern in
+in JavaScript is to send a success and a failure function to an asynchronous
+method.
+
+```js
+function successCallback(result) {
+  console.log('It succeeded with ' + result);
+}
+
+function failureCallback(error) {
+  console.log('It failed with ' + error);
+}
+
+doSomething(successCallback, failureCallback);
+```
+
+Looking at it this way may seem simple, but when there are chained events that
+we get a famous problem, known as `callback hell`.
+callback hell
+
+```js
+a((resultFromA) => {
+  b(resultFromA, (resultFromB) => {
+    c(resultFromB, (resultFromC) => {
+      d(resultFromC, (resultFromD) => {
+        e(resultFromD, (resultFromE) => {
+          f(resultFromE, (resultFromF) => {
+            console.log(resultFromF)
+          });
+        });
+      });
+    });
+  });
+});
+```
+
+With the arrival of `Promise`, we're able to work more elegantly, there's still
+there is still chaining, but we have advantages, such as the callback passed
+will only be executed at the end of the current Event Loop execution cycle,
+while the `Promise` does not depend on it. To get the result of a `Promise
+we must use the `keyword` `then`.
+
+```js
+a().then((resultFromA) => {
+  return b(resultFromA)
+})
+.then((resultFromB) => {
+  return c(resultFromB)
+})
+.then((resultFromC) => {
+  return d(resultFromC)
+})
+.then((resultFromD) => {
+  return e(resultFromD)
+})
+.then((resultFromE) => {
+  return f(resultFromE)
+})
+.then((resultFromF) => {
+  console.log(resultFromF)
+})
+```
+
+Obviously these examples have a lot of strings, which is not very common,
+but when you have a case where you need too many strings, even ``Promise`` won't work.
+won't even solve it, but at least it becomes more readable and safer to use.
+
+### The Promise object
+
+Above I showed you how a `Promise` is used, but to create one there are a few
+one of them is using the global `Promise` object, inside this object
+object, there are many useful methods for working with `Promise`s, but I will focus on the
+but I will focus on the basics.
+
+A `Promise` can be created with the `keyword` `new` where we pass a function that has
+two functions in its parameters, `resolve` and `reject`. The `resolve` function returns
+the data passed if the `Promise` is completed, while `reject` returns an error from this
+`Promise`.
+
+```js
+new Promise((resolve, reject) => {
+  resolve(console.log('Initial'));
+})
+.then(() => {
+  reject('Something failed');
+  console.log('Do this');
+})
+.catch(() => {
+  console.log('Do that');
+})
+.then(() => {
+  console.log('Do this whatever happened before');
+});
+```
+
+In the log it will appear: Initial -> Do that -> Do this whatever happened before.
+
+## Evolving with async and await
+
+There are many cases where using `then` to wait for a `Promise` starts to get
+complex, creating several `closures` at different levels, so
+implemented a `feature` in JavaScript where we can create a `Promise` from a common
+from a regular function, rather than using the global object.
+
+With the `keywords` `async` and `await` we can work imperatively
+asynchronous programming as if it were synchronous.
+
+```js
+async function getGithubData() {
+  return fetch('https://api.github.com/users/azagatti')
+}
+async function myPromise() {
+  const response = await getGithubData()
+  const data = await response.json()
+  return data
+}
+console.log(await myPromise())
+```
+
+Normally it would not be possible to use `await` in a scope outside of a function
+function with `async`, but recently a new `feature` came into `v8` (main JavaScript engine)
+JavaScript engine), called [Top-level await](https://v8.dev/features/top-level-await),
+so we can use `await` outside of `async` functions in newer
+versions of browsers and servers that run `v8`.
+
+Getting back to the point, as in the example shown, we can wait for asynchronous operations
+and then run other synchronous processes, it generally helps to maintain
+readability of the code and keep the code clean by creating new variables and
+functions. Remember that whenever we add the prefix `async` to a
+function, it automatically becomes a `Promise`, so when we use
+we must use `then` or `await`, otherwise it will run and we won't get any
+feedback, and there are cases where we really don't need it.
+
+## Finishing
+
+Finally, always use `return` if you are using `then` inside a
+function with `async`, otherwise the compiler will just ignore it and run in background,
+what I recommend is to choose one of the approaches to the case, either use `async`
+together with `await` or `then`. I should also bring up another article about the methods
+we can use with `Promise` since they are many and have many uses.
+
+### References:
+
+- [Concurrency Model and Event Looping](https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/EventLoop)
+- [Using promises](https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Guide/Using_promises)
+- [Async functions - making friendly promises](https://developers.google.com/web/fundamentals/getting-started/primers/async-functions)

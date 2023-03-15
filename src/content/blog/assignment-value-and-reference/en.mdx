@@ -1,0 +1,170 @@
+---
+title: Value and reference assignment
+pubDate: '2021-07-16T03:00:00Z'
+description: Why we should be careful when reassigning data to non-primitive values.'
+tags: [javascript, variable, value, reference]
+keywords: [javascript, variable, value, reference]
+heroImage: '/img/assignment-value-and-reference.jpeg'
+---
+
+<img
+  src="/img/assignment-value-and-reference.jpeg"
+  alt="Value and reference assignment"
+/>
+
+---
+
+## Data Types
+
+When we assign a value to a variable, it can be a primitive value or a data structure.
+
+#### Primitive values
+
+The primitive values in JavaScript are: String, Number, Boolean, Null
+(special primitive), undefined, and Symbol. These values are immutable, so when
+we change a variable with any of these data types, a new reference in memory is
+created, the same happens when we assign a variable to another.
+
+```js
+let value = 'Zagatti'
+let newValue = value
+```
+
+In the example above, both variables are equal because they both contain a
+primitive type that can be compared within JavaScript, but if we change either
+of them, this change will not be reflected in the other.
+
+This is what we can call assignment by value because the variables do not share
+the same reference, being independent.
+
+#### Non-primitive values
+
+In JavaScript, we can say that non-primitive values encompass the types
+[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)
+and
+[Function](https://developer.mozilla.org/en-US/docs/Glossary/Function),
+which in the case of JavaScript, arrays, literal objects, Maps, etc., are of
+type Object.
+
+```js
+const reference = { name: 'Zagatti' }
+const newReference = { name: 'Zagatti' }
+
+console.log(reference === newReference) // false
+```
+
+If we use the comparison operator between equal objects, we get a `false` as a
+result because they are different objects, containing the same information
+but having different references.
+
+```js
+const reference = { name: 'Zagatti' }
+const newReference = reference
+
+console.log(reference === newReference) // true
+```
+
+As we can see, the comparison operator returned `true`, because the comparison is
+between the same object, which is what we can call assignment by reference.
+
+This is the type of assignment that we should pay more attention and care to because
+if we change the object through any of the variables, it will be reflected in the other.
+
+```js
+const reference = { name: 'Zagatti' }
+const newReference = reference
+newReference.name = 'Andre'
+
+console.log(reference) // { name: 'Andre' }
+```
+
+There are many ways to create a new reference to the object, the most used is
+with the spread introduced in ES6.
+
+```js
+const reference = { name: 'Zagatti' }
+const newReference = { ...reference }
+newReference.name = 'Andre'
+
+console.log(reference) // { name: 'Zagatti' }
+```
+
+In daily life, we use a lot of arrays of objects, and in this case, it begins to
+become more complex to take care of the reference because we can create a new
+array with the spread, but we still have the same internal object references,
+and it becomes more complex when we have even more levels in the object with
+other objects.
+
+```js
+const reference = [{ name: 'Zagatti' }]
+const newReference = [...reference]
+newReference[0].name = 'Andre'
+
+console.log(reference) // [{ name: 'Andre' }]
+```
+
+There are
+[several ways to clone an array or object in JavaScript](https://stackoverflow.com/questions/728360/how-do-i-correctly-clone-a-javascript-object),
+but I leave it up to you to read on the link or research more about it.
+
+## Beware of mutability
+
+In many cases, we create functions to manipulate arrays within JavaScript.
+Therefore, we must be careful with certain methods that directly alter the array.
+Instead, in most cases, it is preferable to use methods that generate and return
+a new array or data.
+
+```js
+const array = [1, 2, 3]
+
+function removeLastItem(arr) {
+  arr.splice(-1, 1)
+  return arr
+}
+
+const newArray = removeLastItem(array)
+
+console.log(array) // [1, 2]
+console.log(newArray) // [1, 2]
+```
+
+In many cases, we want to preserve the original value, so the example with `splice`
+wouldn't work well. For the same operation, we have the `slice` method.
+
+```js
+const array = [1, 2, 3]
+
+function removeLastItem(arr) {
+  return arr.slice(null, -1)
+}
+
+const newArray = removeLastItem(array)
+
+console.log(array) // [1, 2, 3]
+console.log(newArray) // [1, 2]
+```
+
+The methods that mutate the array are: `copyWithin`, `fill`, `flat`, `pop`,
+`push`, `reverse`, `shift`, `sort`, `splice`, and `unshift`. All the others
+create a new data while keeping the original array intact.
+
+## Conclusion
+
+Understanding the different data types of a language is essential to work at a
+high level. Without understanding the difference between assigning a value or a
+reference to a variable, it becomes complex to understand the data flow of the
+application and to predict data being changed in different contexts having the
+same reference spread throughout the application.
+
+It's not a difficult concept to understand, and I hope that at the end of this
+post, you have understood how to create advantages in different contexts, mutating
+or not your data structures.
+
+#### References
+
+- [Primitive Values](https://developer.mozilla.org/pt-BR/docs/Glossary/Primitive)
+- [Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)
+- [Function](https://developer.mozilla.org/en-US/docs/Glossary/Function)
+- [JavaScript data types and data structures](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures)
+- [Clone JavaScript Object](https://stackoverflow.com/questions/728360/how-do-i-correctly-clone-a-javascript-object)
+- [Mutating x Non-mutating array methods](https://stackoverflow.com/a/54836218/11501938)

@@ -7,11 +7,7 @@ keywords: [javascript, react, state, props, efeito]
 heroImage: '/img/pillars-react.jpeg'
 ---
 
-<img
-  src="/img/pillars-react.jpeg"
-  alt="Os Pilares do React"
-  
-/>
+<img src="/img/pillars-react.jpeg" alt="Os Pilares do React" />
 
 ---
 
@@ -28,7 +24,7 @@ O foco deste post é introduzir os pilares necessários para desenvolver suas pr
 Considere esse o primeiro componente da aplicação:
 
 ```js
-import React from 'react';
+import React from 'react'
 
 function App() {
   return (
@@ -38,7 +34,7 @@ function App() {
   )
 }
 
-export default App;
+export default App
 ```
 
 Essa declaração estranha de tags não é uma string, muito menos HTML comum.
@@ -50,7 +46,7 @@ JSX é uma extensão de sintaxe para o Javascript (JavaScript eXtension) baseado
 O código transpilado para criar uma div vazia seria algo do tipo:
 
 ```js
-React.createElement('div', null);
+React.createElement('div', null)
 ```
 
 ---
@@ -62,25 +58,25 @@ Quando trabalhamos com React utilizamos o conceito de componentização, ou seja
 Antigamente utilizávamos componentes de classe para trabalhar com estados mas hoje utilizamos somente componentes funcionais graças a "nova" API de hooks.
 
 ```jsx
-import React from 'react';
+import React from 'react'
 
 export default function Person() {
-  return <h1>O nome da pessoa é: André Zagatti</h1>;
+  return <h1>O nome da pessoa é: André Zagatti</h1>
 }
 ```
 
 Essa função é um componente de React válido porque não está recebendo nenhum parâmetro(pode receber as propriedades como já vamos ver) e retorna um elemento JSX do React. Esses componentes são chamados de componentes funcionais, pois são literalmente funções do Javascript. Um detalhe, sempre que utilizarmos a sintaxe de JSX devemos importar o React.
 
 ```jsx
-import React from 'react';
+import React from 'react'
 
-import Person from './components/Person';
+import Person from './components/Person'
 
 function App() {
-  return <Person />;
+  return <Person />
 }
 
-export default App;
+export default App
 ```
 
 Como vimos antes o React entende as tags do HTML no JSX mas também podemos utilizar nossos próprios componentes como tags.
@@ -90,19 +86,19 @@ Como vimos antes o React entende as tags do HTML no JSX mas também podemos util
 As props dos componentes do React se assemelham a atributos passados para tags do HTML.
 
 ```jsx
-import React from 'react';
+import React from 'react'
 
 export default function Person(props) {
-  return <h1>O nome da pessoa é: {props.name}</h1>;
+  return <h1>O nome da pessoa é: {props.name}</h1>
 }
 ```
 
 Agora o componente **Person** não fica preso a um nome estático e pode ser reutilizado simplesmente passando outro nome para as props.
 
 ```jsx
-import React from 'react';
+import React from 'react'
 
-import Person from './components/Person';
+import Person from './components/Person'
 
 function App() {
   return (
@@ -111,10 +107,10 @@ function App() {
       <Person name="Andre of Astora" />
       <Person name="Sigmeyer of Catarina" />
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
 ```
 
 Quando passamos dados utilizando as props de um componente temos que passar exatamente o nome que será usado dentro do componente como o nome da prop. Essa passagem de dados nomeados é normalmente chamada de **Named/Labeled Arguments**, com os objetos do JavaScript é muito fácil utilizar esse modelo.
@@ -126,12 +122,12 @@ O estado do componente é uma variável que armazena informações atuais do com
 Para utilizarmos o estado em componentes funcionais utilizamos a "nova" API do React chamada de hooks. O hook de estado se chama `useState`, que é uma função que recebe o estado inicial e retorna um array sendo a primeira posição o valor do estado e a segunda uma função para atualizar esse valor seguindo os conceitos da [imutabilidade](https://desenvolvedor.expert/por-que-imutabilidade-eh-importante-fd0ba22f103e?gi=6922abd860f).
 
 ```jsx
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 
-import Person from './components/Person';
+import Person from './components/Person'
 
 function App() {
-  const [name, setName] = useState('');
+  const [name, setName] = useState('')
   /**
    * É o mesmo que
    * const nameState = useState('');
@@ -148,10 +144,10 @@ function App() {
       />
       <Person name={name} />
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
 ```
 
 Nesse componente estamos utilizando os pilares do estado e de props.
@@ -167,27 +163,27 @@ No componente de `Person` podemos ver que não está sendo mais passada uma stri
 Quando utilizávamos componentes de classe era comum utilizarmos os métodos de ciclo de vida do componente. Esses métodos ficavam responsáveis por executar funções e alterar dados quando o componente montava, era alterado ou era desmontado. Hoje com a API de hooks utilizamos um único hook para tratar esses casos, chamado de useEffect.
 
 ```jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'
 
 function App() {
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState(0)
 
   useEffect(() => {
-    const interval = setInterval(() => setCount(count + 1), 1000);
+    const interval = setInterval(() => setCount(count + 1), 1000)
 
     return () => {
-      clearInterval(interval);
-    };
-  }, [count]);
+      clearInterval(interval)
+    }
+  }, [count])
 
   return (
     <div>
       <h1>{count} segundos</h1>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
 ```
 
 O `useEffect` recebe como primeiro parâmetro uma função de callback com o código que será executado quando o componente for montado, o segundo parâmetro é o array de dependências do hook de efeito, esse array de dependências são as variáveis externas utilizadas dentro dele e que ele observará, quando acontecer uma alteração nessas variáveis ele executará novamente.
@@ -197,23 +193,23 @@ Como tem uma alteração no state do componente todo segundo por conta do `setIn
 Existe uma sintaxe alternativa de utilização da função de alterar o estado que pode eliminar essa repetida execução do `useEffect`(que causa muitos loops) retirando o count do array de dependências.
 
 ```jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'
 
 function App() {
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState(0)
 
   useEffect(() => {
-    setInterval(() => setCount((state) => state + 1), 1000);
-  }, []);
+    setInterval(() => setCount((state) => state + 1), 1000)
+  }, [])
 
   return (
     <div>
       <h1>{count} segundos</h1>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
 ```
 
 Utilizando um callback para alterar o estado é possível recuperar o valor atual do estado e utilizando ele já para criar um novo. Mas como funções como Interval podem ficar rodando em background sem que percebamos recomendo deixar o return limpando o Interval como precaução.
@@ -223,28 +219,28 @@ Utilizando um callback para alterar o estado é possível recuperar o valor atua
 Como bônus resolvi colocar como fazer uma chamada a API. Para isso usaremos o hook de efeito e a API nativa para requests HTTP chamada fetch.
 
 ```jsx
-import React, { useEffect } from 'react';
+import React, { useEffect } from 'react'
 
 export default function App() {
   useEffect(() => {
-    (async () => {
-      const response = await fetch('https://api.github.com/users/azagatti');
-      const data = await response.json();
-      console.log(data);
-    })();
-  }, []);
+    ;(async () => {
+      const response = await fetch('https://api.github.com/users/azagatti')
+      const data = await response.json()
+      console.log(data)
+    })()
+  }, [])
 
   return (
     <div>
       <h2>Fetch data!</h2>
     </div>
-  );
+  )
 }
 ```
 
-Algumas coisas interessantes de se notar, não é possível usar diretamente o `async` no `useEffect`, então normalmente seria possível usar a síntaxe de Promise com `then` mas podemos utilizar uma IIFE(Immediately invoked function expression) para escrever com a síntaxe de `async` e `await`.
+Algumas coisas interessantes de se notar, não é possível usar diretamente o `async` no `useEffect`, então normalmente seria possível usar a sintaxe de Promise com `then` mas podemos utilizar uma IIFE (Immediately invoked function expression) para escrever com a sintaxe de `async` e `await`.
 
-O que fazer em seguida? Normalmente armazenariamos esse data retornado da API num estado e realizariamos um map no `JSX` para mostrar os dados que quisermos, até poderiamos criar novos componente que recebam por `props` esses dados e fiquem com a responsabilidade de exibir os valores.
+O que fazer em seguida? Normalmente armazenaríamos esse data retornado da API num estado e realizaríamos um map no `JSX` para mostrar os dados que quisermos, até poderíamos criar novos componente que recebam por `props` esses dados e fiquem com a responsabilidade de exibir os valores.
 
 ## Conclusão
 
@@ -257,11 +253,3 @@ Para quem quiser testar os códigos facilmente sem criar todo o ambiente, pode u
 https://reactjs.org/ ou https://pt-br.reactjs.org/
 
 https://www.youtube.com/watch?v=dpw9EHDh2bM
-
-### Recomendações de conteúdos:
-
-Rocketseat com conteúdos sempre atualizados: https://cutt.ly/0yjvA6A
-
-Vinicius Dacal com vídeos de React, JS e etc: https://cutt.ly/TyjvSlz
-
-Em breve: https://cutt.ly/nyjvJk6

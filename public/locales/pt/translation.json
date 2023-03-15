@@ -1,0 +1,17 @@
+{
+  "name": "André Zagatti",
+  "footer": {
+    "description": "Engenheiro de software frontend que gosta de compartilhar conhecimento.",
+    "year": "© {{year}}, André Zagatti",
+    "aria": {
+      "github": "Olhe meu Github",
+      "linkedin": "Olhe meu Linkedin",
+      "twitter": "Olhe meu Twitter"
+    }
+  },
+  "theme-button": {
+    "aria": {
+      "button": "Alterar tema"
+    }
+  }
+}

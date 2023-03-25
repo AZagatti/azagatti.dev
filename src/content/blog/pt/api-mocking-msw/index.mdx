@@ -1,0 +1,295 @@
+---
+title: Mocks de API com MSW
+pubDate: '2023-03-27T03:00:00Z'
+description: "Criando mocks de API's para testes e debug com MSW."
+tags: [javascript, testing, mock]
+keywords: [javascript, testing, mock]
+heroImage: '/img/msw.jpeg'
+---
+
+<img src="/img/msw.jpeg" alt="Mocks de API com MSW" />
+
+---
+
+Quando não temos uma API pronta para desenvolver uma funcionalidade, geralmente
+a boa prática é não ficar de braços cruzados esperando e utilizar algum tipo de
+mock para desenvolver, considerando que já temos o contrato dessa API. Com isso,
+podemos fixar o valor ou ir além e utilizar uma ferramenta própria para isso. Mas
+não é apenas nesse caso que utilizamos mocks. Quando criamos testes unitários e de
+integração que precisam dessa comunicação, também utilizamos mocks e, se não tomarmos
+cuidado, eles podem acabar sujando a base de código. Eles podem ser implementados de
+forma complexa e ter dificuldade em fornecer um retorno mais próximo do real. É aí que
+o [Mock Service Worker](https://mswjs.io/) toma a frente e faz um mock a nível
+de rede com uma sintaxe simples, criando um padrão para que a base de código
+fique limpa.
+
+## Entendendo o Mock Service Worker (msw)
+
+Como eu comentei, o mock do msw é a nível de rede. Portanto, criamos uma espécie
+de servidor onde temos acesso às variáveis que estão sendo enviadas na request.
+Podemos controlar o status, os dados que serão retornados e muito mais.
+
+Um pequeno exemplo:
+
+```ts
+import { setupWorker, rest } from 'msw'
+interface LoginBody {
+  username: string
+}
+interface LoginResponse {
+  username: string
+  firstName: string
+}
+const worker = setupWorker(
+  rest.post<LoginBody, LoginResponse>('/login', async (req, res, ctx) => {
+    const { username } = await req.json()
+    return res(
+      ctx.json({
+        username,
+        firstName: 'John',
+      })
+    )
+  })
+)
+worker.start()
+```
+
+Este é um exemplo básico de uma rota de login, em que recebemos o `username`
+por meio do objeto request e retornamos os dados da forma que preferirmos. Neste
+exemplo, o `username` recebido é acompanhado por um `firstName` qualquer. Podemos
+escrever os `handlers` com Typescript, o que torna muito mais fácil entender o
+que está sendo recebido e o que deve ser enviado, permitindo compartilhar esses
+tipos com as requisições originais do projeto.
+
+## Exemplo real
+
+Podemos utilizar o exemplo anterior do fluxo de login para entender de forma mais
+completa a implementação em um projeto real.
+
+Primeiro criamos a tela de login, nesse exemplo com React:
+
+```tsx
+import { ChangeEvent, FormEvent, useState } from 'react'
+
+import { onLogin, LoginResponse } from './login'
+
+export const LoginForm = () => {
+  const [username, setUsername] = useState('')
+  const [userData, setUserData] = useState<LoginResponse>()
+
+  const handleUsernameChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setUsername(event.target.value)
+  }
+
+  const handleFormSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+
+    onLogin({ username }).then(setUserData)
+  }
+
+  if (userData) {
+    return (
+      <div>
+        <h1>
+          <span data-testid="firstName">{userData.firstName}</span>{' '}
+          <span data-testid="lastName">{userData.lastName}</span>
+        </h1>
+        <p data-testid="userId">{userData.id}</p>
+      </div>
+    )
+  }
+
+  return (
+    <form onSubmit={handleFormSubmit}>
+      <div>
+        <label htmlFor="username">Username:</label>
+        <input
+          id="username"
+          name="username"
+          value={username}
+          onChange={handleUsernameChange}
+        />
+        <button type="submit">Submit</button>
+      </div>
+    </form>
+  )
+}
+```
+
+O arquivo com a função de login ficou da seguinte forma:
+
+```ts
+export interface LoginParams {
+  username: string
+}
+
+export interface LoginResponse {
+  id: string
+  username: string
+  firstName: string
+  lastName: string
+}
+
+export const onLogin = async ({
+  username,
+}: LoginParams): Promise<LoginResponse> => {
+  const response = await fetch('https://some-api.com/login', {
+    method: 'POST',
+    body: JSON.stringify({
+      username,
+    }),
+  })
+  return response.json()
+}
+```
+
+Antes de criar o arquivo de testes podemos já fazer o `setup` do msw.
+
+Primeiro já definimos os `handlers`, que nesse caso é somente para a rota `post`
+de login:
+
+```ts
+import { rest } from 'msw'
+
+import { LoginParams, LoginResponse } from './login'
+
+export const loginResponse = {
+  id: 'f79e82e8-c34a-4dc7-a49e-9fadc0979fda',
+  firstName: 'André',
+  lastName: 'Zagatti',
+}
+
+export const handlers = [
+  rest.post<LoginParams, LoginResponse>(
+    'https://some-api.com/login',
+    async (req, res, ctx) => {
+      const { username } = await req.json<LoginParams>()
+      return res(ctx.json({ ...loginResponse, username }))
+    }
+  ),
+]
+```
+
+Lembrando que podemos definir quantos `handlers` forem necessários, podendo criar
+outros arquivos de `handlers` separando por contextos e depois passar todos esses
+`handlers` para o arquivo que cria o servidor.
+
+Com o `handler` criado podemos definir um ou dois arquivos, um deles para rodar
+em modo de desenvolvimento e outro para os testes:
+
+```ts
+import { setupWorker } from 'msw'
+
+import { handlers } from './handlers'
+
+export const worker = setupWorker(...handlers)
+```
+
+```ts
+import { setupServer } from 'msw/node'
+
+import { handlers } from './handlers'
+
+export const server = setupServer(...handlers)
+```
+
+O primeiro é utilizado para rodar no navegador e para que possamos ter o mock em
+modo de desenvolvimento. Já o segundo é criado usando o `msw/node` e é utilizado
+para rodar do lado do servidor, como em testes.
+
+Para utilizar em modo de desenvolvimento é só colocar no arquivo de entrada da
+aplicação a seguinte opção (pode mudar a forma de encontrar a env de desenvolvimento):
+
+```ts
+if (process.env.NODE_ENV === 'development') {
+  const { worker } = require('./browser')
+  worker.start()
+}
+```
+
+Agora podemos criar o teste:
+
+```tsx
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+
+import { LoginForm } from './App'
+import { loginResponse } from './handlers'
+
+describe('LoginForm', () => {
+  it('allow a user to log in', async () => {
+    render(<LoginForm />)
+
+    await userEvent.type(screen.getByLabelText(/username/i), 'azagatti')
+
+    userEvent.click(screen.getByRole('button', { name: /submit/i }))
+
+    expect(await screen.findByText(loginResponse.id)).toBeInTheDocument()
+    expect(await screen.findByText(loginResponse.firstName)).toBeInTheDocument()
+    expect(await screen.findByText(loginResponse.lastName)).toBeInTheDocument()
+  })
+})
+```
+
+E no nosso arquivo de `setup` para os testes adicionamos o servidor que criamos
+anteriormente:
+
+```ts
+import { server } from './server'
+
+beforeAll(() => {
+  // Enable the mocking in tests.
+  server.listen()
+})
+
+afterEach(() => {
+  // Reset any runtime handlers tests may use.
+  server.resetHandlers()
+})
+
+afterAll(() => {
+  // Clean up once the tests are done.
+  server.close()
+})
+```
+
+Com isso, não precisamos adicionar nenhum mock dentro do próprio teste e o teste
+irá rodar de forma mais próxima à como o usuário faria. Também podemos utilizar
+o mock do `handler` para fazer os `asserts`, o que torna fácil a mudança dos testes.
+
+## Indo além
+
+Essa foi uma introdução de como utilizar o msw, mas a ferramenta não para por aí.
+Temos diversas integrações que podemos utilizar para melhorar a criação desses
+`handlers`, como, por exemplo, a [biblioteca de dados](https://github.com/mswjs/data)
+para criar esses dados de forma mais complexa, com relacionamentos e outras
+coisas do tipo.
+
+Exemplo:
+
+```js
+import { factory, primaryKey } from '@mswjs/data'
+
+export const db = factory({
+  // Create a "user" model,
+  user: {
+    // ...with these properties and value getters.
+    id: primaryKey(() => 'abc-123'),
+    firstName: () => 'André',
+    lastName: () => 'Zagatti',
+  },
+})
+```
+
+Vale a pena dar uma olhada nos exemplos da documentação e também nos outros
+pacotes que estão no Github da própria organização do msw:
+
+- [Recipes](https://mswjs.io/docs/recipes)
+- [mswjs - Github](https://github.com/mswjs)
+
+Espero que este artigo tenha sido uma boa introdução para a ferramenta e que
+tenha conseguido demonstrar como é fácil e por que utilizar o msw.
+
+Vale ressaltar que o exemplo foi com `rest`. Na documentação, temos exemplos
+com `graphql` também. E falando na documentação, se for integrar o msw em algum
+projeto, siga o passo a passo de integração no [site oficial](https://mswjs.io/docs/getting-started).

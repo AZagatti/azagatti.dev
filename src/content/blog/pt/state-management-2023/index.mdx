@@ -1,0 +1,449 @@
+---
+title: Gerenciamento de estados no React em 2023
+pubDate: '2023-04-19T03:00:00Z'
+description: 'Bibliotecas e cenário do gerenciamento de estados no React em 2023.'
+tags: [javascript, state management, react]
+keywords: [javascript, state management, react]
+heroImage: '/img/state-management-2023.jpeg'
+---
+
+<img src="/img/state-management-2023.jpeg" alt="Gerenciamento de estados no React em 2023" />
+
+---
+
+O gerenciamento de estado global é uma abordagem comum em aplicações ReactJS que
+permite compartilhar e acessar o estado de maneira centralizada entre vários
+componentes. Isso pode ser realizado com o uso de bibliotecas como Redux ou MobX,
+que fornecem uma camada adicional de gerenciamento de estado, tornando a aplicação
+mais escalável e fácil de manter.
+
+Para implementar o gerenciamento de estado global, é importante definir as ações
+que podem ser executadas na aplicação e criar um modelo de dados que represente
+o estado da aplicação. Essa abordagem permite que a lógica de negócios seja isolada
+do componente em si, permitindo uma melhor organização e manutenção do código.
+
+## Redux e o início
+
+O [Redux](https://redux.js.org/) foi criado em 2015 por [Dan Abramov](https://twitter.com/dan_abramov),
+desenvolvedor e entusiasta do ReactJS. Ele desenvolveu o Redux como uma solução
+para os problemas de gerenciamento de estado que surgem em aplicações ReactJS à
+medida que elas crescem em tamanho e complexidade.
+
+Na época de seu lançamento, o Redux foi amplamente adotado pela comunidade ReactJS,
+tornando-se uma das principais bibliotecas de gerenciamento de estado global
+utilizadas pelos desenvolvedores. Sua popularidade se deve em grande parte à sua
+simplicidade e previsibilidade, que facilita a implementação e a manutenção de
+aplicações complexas.
+
+## Opções para 2023
+
+Em uma votação chamada [JavaScript Rising Stars](https://risingstars.js.org/2022/en#section-statemanagement)
+temos uma categoria específica para bibliotecas de gerenciamento de estados e
+grande parte sendo possível utilizar no React, aqui vou citar algumas delas e
+mostrar um exemplo simples.
+
+### Redux e Redux Toolkit
+
+O Redux permite que o estado da aplicação seja armazenado em um único objeto
+chamado "store", que é acessível por todos os componentes da aplicação. O estado
+só pode ser modificado através de ações que descrevem o que aconteceu na aplicação,
+e são processadas pelos "reducers" do Redux, que atualizam o estado da aplicação.
+
+O Redux é uma solução popular para gerenciamento de estado global em aplicações
+ReactJS devido à sua simplicidade e previsibilidade, o que facilita a implementação
+e manutenção de aplicações complexas. No entanto, sua implementação pode ser um
+pouco complicada para desenvolvedores iniciantes.
+
+Para simplificar a implementação do Redux, em 2019, foi criado o [Redux Toolkit](https://redux-toolkit.js.org/),
+uma biblioteca oficial do Redux que fornece uma API simplificada para a criação
+e gerenciamento do estado da aplicação. O Redux Toolkit inclui recursos como o
+"createSlice", que permite criar reducers de forma mais fácil e eficiente, e o
+"configureStore", que permite configurar a "store" Redux com vários recursos,
+incluindo middleware e ferramentas de desenvolvedor.
+
+Aqui um exemplo de contador utilizando o Redux Toolkit:
+
+```js
+import React from 'react'
+import { useSelector, useDispatch, Provider } from 'react-redux'
+import { createSlice, configureStore } from '@reduxjs/toolkit'
+
+const counterSlice = createSlice({
+  name: 'counter',
+  initialState: { value: 0 },
+  reducers: {
+    increment: (state) => {
+      state.value += 1
+    },
+    decrement: (state) => {
+      state.value -= 1
+    },
+    incrementByAmount: (state, action) => {
+      state.value += action.payload
+    },
+  },
+})
+
+const { increment, decrement, incrementByAmount } = counterSlice.actions
+const counterReducer = counterSlice.reducer
+
+const store = configureStore({
+  reducer: {
+    counter: counterReducer,
+  },
+})
+
+const Counter = () => {
+  const count = useSelector((state) => state.counter.value)
+  const dispatch = useDispatch()
+
+  return (
+    <div>
+      <button onClick={() => dispatch(increment())}>Aumentar</button>
+      <span>{count}</span>
+      <button onClick={() => dispatch(decrement())}>Diminuir</button>
+      <button onClick={() => dispatch(incrementByAmount(10))}>
+        Aumentar em 10
+      </button>
+    </div>
+  )
+}
+
+const App = () => {
+  return (
+    <Provider store={store}>
+      <Counter />
+    </Provider>
+  )
+}
+```
+
+Nesse exemplo, definimos o slice do Redux Toolkit e o reducer em um único arquivo.
+Depois, criamos a store e envolvemos o componente `Counter` com o Provider do
+Redux para que ele possa acessar a store global. Por fim, utilizamos o hook
+`useSelector` para acessar o estado do contador e o hook `useDispatch` para
+despachar as funções reducer que atualizam o estado do contador.
+
+É claro que em um estado mais complexo, a `action` poderia ser mais trabalhada,
+mas vamos manter um contador como exemplo para as próximas bibliotecas.
+
+### Mobx
+
+O [MobX](https://mobx.js.org/) é uma biblioteca de gerenciamento de estado que
+utiliza o conceito de programação reativa para tornar a atualização de estados
+em aplicações React mais simples e intuitiva. Com o MobX moderno, não é necessário
+o uso de decoradores, sendo possível gerenciar o estado utilizando funções comuns
+e hooks do React.
+
+O pacote [mobx-react-lite](http://npmjs.com/package/mobx-react-lite) fornece
+suporte a componentes de função com o uso do hook `useObserver`, que permite que
+os componentes se inscrevam em observáveis e sejam atualizados automaticamente
+sempre que ocorrem mudanças. Com sua abordagem simples e suporte a componentes
+de função, o MobX moderno pode ser uma boa escolha para projetos menores ou para
+desenvolvedores que desejam uma solução de gerenciamento de estado mais fácil de entender e implementar.
+
+Um exemplo de contador com utilizando o mobx-react-lite:
+
+```js
+import React, { useState } from 'react'
+import { observer } from 'mobx-react-lite'
+import { makeAutoObservable } from 'mobx'
+
+class Counter {
+  value = 0
+
+  constructor() {
+    makeAutoObservable(this)
+  }
+
+  increment() {
+    this.value++
+  }
+
+  decrement() {
+    this.value--
+  }
+
+  incrementByAmount(amount) {
+    this.value += amount
+  }
+}
+
+const counter = new Counter()
+
+const CounterComponent = observer(() => {
+  return (
+    <div>
+      <button onClick={() => counter.increment()}>Aumentar</button>
+      <span>{counter.value}</span>
+      <button onClick={() => counter.decrement()}>Diminuir</button>
+      <button onClick={() => counter.incrementByAmount(10)}>
+        Aumentar em 10
+      </button>
+    </div>
+  )
+})
+
+const App = () => {
+  return <CounterComponent />
+}
+```
+
+Nesse exemplo, definimos uma classe `Counter` que utiliza a função `makeAutoObservable`
+para tornar a propriedade "value" observável. Em seguida, criamos o componente
+`CounterComponent` com o uso do HoC `observer` para permitir a atualização
+automática do componente sempre que ocorrem mudanças no estado. Dentro do componente,
+utilizamos as funções da classe `Counter` para atualizar o estado do contador.
+
+### XState
+
+O [XState](https://xstate.js.org/docs/) é uma biblioteca de gerenciamento de
+estados baseada em máquinas de estado finito que utiliza a linguagem de programação
+JavaScript. Ela permite modelar o comportamento de um sistema através de uma máquina
+de estados e fornece um conjunto de ferramentas para gerenciar a transição de
+estados e ações associadas a essas transições. Com o XState, é possível criar
+fluxos de trabalho complexos e gerenciá-los de forma eficiente em aplicações React.
+
+No React, é possível utilizar o XState através do pacote "xstate-react", que
+fornece hooks e componentes para a integração com a biblioteca. Com o uso dessas
+ferramentas, é possível criar componentes React que gerenciam seu estado através
+de máquinas de estado finito e reagem a mudanças de estado de forma automática.
+
+Um exemplo de contador utilizando o XState:
+
+```js
+import React from 'react'
+import { useMachine } from '@xstate/react'
+import { createMachine } from 'xstate'
+
+const counterMachine = createMachine(
+  {
+    id: 'counter',
+    context: {
+      count: 0,
+    },
+    states: {
+      active: {
+        on: {
+          INCREMENT: {
+            actions: 'increment',
+          },
+          DECREMENT: {
+            actions: 'decrement',
+          },
+          INCREMENT_BY_AMOUNT: {
+            actions: 'incrementByAmount',
+          },
+        },
+      },
+    },
+  },
+  {
+    actions: {
+      increment: (context) => {
+        context.count++
+      },
+      decrement: (context) => {
+        context.count--
+      },
+      incrementByAmount: (context, event) => {
+        context.count += event.value
+      },
+    },
+  }
+)
+
+const Counter = () => {
+  const [state, send] = useMachine(counterMachine)
+
+  return (
+    <div>
+      <button onClick={() => send('INCREMENT')}>Aumentar</button>
+      <span>{state.context.count}</span>
+      <button onClick={() => send('DECREMENT')}>Diminuir</button>
+      <button onClick={() => send({ type: 'INCREMENT_BY_AMOUNT', value: 10 })}>
+        Aumentar em 10
+      </button>
+    </div>
+  )
+}
+
+const App = () => {
+  return <Counter />
+}
+```
+
+Nesse exemplo, definimos uma máquina de estado finito `counterMachine` que
+gerencia o estado do contador através de transições entre os estados `active`.
+Cada transição é associada a uma ação que é executada ao ocorrer a transição.
+Em seguida, utilizamos o hook `useMachine` para criar uma instância da máquina
+e gerenciar seu estado dentro do componente `Counter`. Por fim, renderizamos o
+valor do contador e os botões de incremento e decremento, que chamam a função
+`send` do hook `useMachine` para executar as transições de estado associadas.
+Com certeza, bem útil para estados mais complexos.
+
+### Jotai
+
+O [Jotai](https://jotai.org/) é uma biblioteca de gerenciamento de estado global para aplicações React,
+que se diferencia por oferecer uma abordagem minimalista e performática para o
+gerenciamento de estado. Ele utiliza o conceito de átomos, que são estados independentes,
+imutáveis e atômicos, tornando a manipulação e compartilhamento de estado mais
+simples e eficiente. Além disso, o Jotai oferece recursos como selectors, middlewares
+e integração com outras bibliotecas de gerenciamento de estado, tornando-o uma opção
+robusta e flexível para aplicações de todos os tamanhos e complexidades.
+
+O Jotai tem se destacado como uma alternativa ao [Recoil](https://recoiljs.org/),
+outra biblioteca popular de gerenciamento de estado para React. Enquanto o Recoil
+usa átomos e seletores para gerenciar estados globais, o Jotai se concentra em
+tornar o gerenciamento de estado mais simples e direto, sem sacrificar a flexibilidade.
+Além disso, o Jotai é mais leve e oferece uma experiência de desenvolvimento mais
+intuitiva e agradável, o que tem levado muitos desenvolvedores a optar por ele
+em vez do Recoil.
+
+Um exemplo de contador utilizando o Jotai:
+
+```js
+import React from 'react'
+import { useAtom, atom } from 'jotai'
+
+const countAtom = atom(0)
+
+const Counter = () => {
+  const [count, setCount] = useAtom(countAtom)
+
+  return (
+    <div>
+      <button onClick={() => setCount((currentCount) => currentCount + 1)}>
+        Aumentar
+      </button>
+      <span>{count}</span>
+      <button onClick={() => setCount((currentCount) => currentCount - 1)}>
+        Diminuir
+      </button>
+      <button onClick={() => setCount((currentCount) => currentCount + 10)}>
+        Aumentar em 10
+      </button>
+    </div>
+  )
+}
+
+const App = () => {
+  return <Counter />
+}
+```
+
+Neste exemplo, estamos utilizando o `useAtom` para acessar o estado gerenciado
+pelo `countAtom`. Também estamos usando a função setCount para atualizar o estado.
+Quando o usuário clica em "Aumentar", "Diminuir" ou "Aumentar em 10", a respectiva
+função é chamada, atualizando o estado e fazendo com que o componente seja
+renderizado novamente.
+
+Além do exemplo de contador, o Jotai oferece outras funcionalidades para lidar
+com casos mais complexos de gerenciamento de estado, como a possibilidade de se
+criar árvores de estados aninhadas e o uso de atalhos para definir múltiplos
+estados de uma vez só. Também é possível utilizar a biblioteca em conjunto com
+outros frameworks, como o React Native e o Next.js, além de ter uma boa integração
+com outras bibliotecas como o React Query e o React Router.
+
+### Zustand
+
+O [Zustand](https://docs.pmnd.rs/zustand/getting-started/introduction) é uma
+biblioteca de gerenciamento de estado para React que tem ganhado popularidade
+por oferecer uma sintaxe simples e funcional para a criação de stores de estado
+global. A biblioteca utiliza o conceito de reducers do Redux, mas de uma maneira
+simplificada, tornando a escrita de código mais intuitiva e menos verbosa. O
+Zustand também é bastante performático, pois utiliza um proxy para lidar com
+atualizações de estado, evitando re-renderizações desnecessárias de componentes.
+
+Particularmente, o Zustand é minha biblioteca favorita atualmente de gerenciamento
+de estados globais no React. A sintaxe simplificada e a boa performance tornam a
+escrita de código mais prática e agradável. Além disso, a biblioteca é compatível
+com outras ferramentas populares de React, como o Redux DevTools e o immer.
+
+Um exemplo de contador com Zustand:
+
+```js
+import React from 'react'
+import { create } from 'zustand'
+
+const useCounter = create((set) => ({
+  count: 0,
+  increment: () => set((state) => ({ count: state.count + 1 })),
+  decrement: () => set((state) => ({ count: state.count - 1 })),
+  incrementByAmount: (amount) =>
+    set((state) => ({ count: state.count + amount })),
+}))
+
+const Counter = () => {
+  const { count, increment, decrement, incrementByAmount } = useCounter()
+
+  return (
+    <div>
+      <button onClick={increment}>Aumentar</button>
+      <span>{count}</span>
+      <button onClick={decrement}>Diminuir</button>
+      <button onClick={() => incrementByAmount(10)}>Aumentar em 10</button>
+    </div>
+  )
+}
+
+const App = () => {
+  return <Counter />
+}
+```
+
+Neste exemplo, usamos a função `create` do Zustand para criar um hook `useCounter`
+que retorna o estado do contador e as funções para modificar o estado. Então,
+dentro do componente `Counter`, usamos o hook `useCounter` para obter o estado e as
+funções necessárias para incrementar, decrementar e incrementar por uma quantidade
+informada.
+
+Um adendo é que podemos passar um "selector" para o hook `useCounter`, que permite
+selecionar um subestado específico e torná-lo disponível para o componente, o
+que ajuda a evitar a renderização desnecessária de outros componentes.
+
+Outra vantagem do Zustand é que ele oferece diversas funcionalidades built-in,
+como middlewares, que podem ser utilizados para adicionar funcionalidades como
+persistência de estado, ou mesmo para gerenciar ações assíncronas. Além disso, o
+Zustand pode ser utilizado fora de componentes React, o que o torna uma opção
+interessante para aplicações que possuem partes não-React. Por fim, o Zustand é
+uma biblioteca fácil de utilizar em testes, já que a sua sintaxe simples e suas
+funcionalidades tornam os testes mais rápidos e menos suscetíveis a erros.
+
+Curiosidade: O [Dai Shi](https://github.com/dai-shi), desenvolvedor open source
+bem conhecido na comunidade React, criou e mantém o Jotai e Zustand, além de outras
+bibliotecas bem conhecidas.
+
+Outra curiosidade: Zustand é estado em alemão, Jotai (状態) é estado em japonês e
+Valtio é estado em finlandês ([mas deveria ser "tila"](https://github.com/pmndrs/valtio/discussions/595)).
+
+## Conclusão
+
+Concluindo, existem diversas bibliotecas de gerenciamento de estado global
+disponíveis para o React, cada uma com suas particularidades e vantagens. O
+Redux é uma das mais antigas e robustas, com um ecossistema enorme e diversas
+ferramentas disponíveis, enquanto o MobX oferece uma solução mais simples e moderna,
+com suporte a componentes de função através do pacote mobx-react-lite.
+
+Por outro lado, o XState é uma biblioteca de gerenciamento de estado baseada
+em máquinas de estado finito, oferecendo uma abordagem mais declarativa e segura
+para gerenciamento de estados complexos. Já o Jotai e o Zustand são bibliotecas
+mais recentes que oferecem soluções simples e performáticas para gerenciamento de
+estados globais, com foco em fácil utilização e baixo overhead. Em última análise,
+a escolha da biblioteca de gerenciamento de estado global dependerá das necessidades
+específicas do projeto, e o importante é sempre buscar entender as vantagens e
+desvantagens de cada uma para tomar a melhor decisão.
+
+Além dessas vale ficar de olho em outras bibliotecas que acabam surgindo,
+quem sabe para uma necessidade específica não vale o teste? Os
+[Signals do Preact](https://preactjs.com/blog/introducing-signals/), por exemplo,
+é uma biblioteca que utiliza os famosos
+[signals](https://www.builder.io/blog/usesignal-is-the-future-of-web-frameworks),
+que podem ser utilizados em aplicações React. O [Valtio](https://valtio.pmnd.rs/)
+(outra do Dai Shi) é outra biblioteca interessante, que oferece um estado global
+reativo e imutável, que pode ser facilmente utilizado em aplicações React, sem a
+necessidade de configurações complexas. Já o
+[Legend-State](https://legendapp.com/open-source/state/) é uma biblioteca minimalista
+para gerenciamento de estados, que oferece uma API simples, fácil de usar e
+oferece alta performance. Vale a pena explorar essas opções e escolher a que
+melhor atende às necessidades do seu projeto.

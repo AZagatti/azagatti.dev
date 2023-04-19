@@ -9,11 +9,21 @@ import { Header } from '../components/header'
 import { ToggleThemeBtn } from '../components/toggle-theme-btn'
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts'
 
+
+export interface Props {
+  title: string
+  description: string
+  image?: string
+  isPost: boolean
+  publishedTime: Date
+}
+
 const {
   title = SITE_TITLE,
   description = SITE_DESCRIPTION,
   image,
   isPost = false,
+  publishedTime,
 } = Astro.props
 ---
 
@@ -24,6 +34,7 @@ const {
       description={description}
       image={image}
       isPost={isPost}
+      publishedTime={publishedTime}
     />
   </head>
 

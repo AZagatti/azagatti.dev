@@ -52,8 +52,8 @@ const pubTime = publishedTime?.toISOString()
 
 <!-- Others -->
 <meta property="github:creator" content="azagatti" />
-<meta property="author" content="André Luis Zagatti Adorna" />
-{isPost && <meta property="article:published_time" content={pubTime} />}
+<meta name="author" property="author" content="André Luis Zagatti Adorna" />
+{isPost && <meta name="article:published_time" property="article:published_time" content={pubTime} />}
 
 <!-- Prism -->
 {isPost && <link href="/prism-night-owl.css" rel="stylesheet" />}

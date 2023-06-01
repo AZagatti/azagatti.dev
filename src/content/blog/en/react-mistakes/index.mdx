@@ -1,0 +1,253 @@
+---
+title: Common mistakes with React
+pubDate: '2023-06-02T03:00:00Z'
+description: 'The most common mistakes when using React.'
+tags: [javascript, react, errors, mistakes]
+keywords: [javascript, react, errors, mistakes]
+heroImage: '/img/react-mistakes.jpeg'
+---
+
+<img src="/img/react-mistakes.jpeg" alt="Common mistakes with React" />
+
+---
+
+When we start using a new language or library, it is common to try to apply a syntax that we already know. However, this approach may not make much sense within the new framework and, even worse, may result in errors that cause bugs. In this post I will address some of these common errors that people make when they first start using React. make when starting to use React.
+
+## Update state directly
+
+React uses the concept of immutability in its state. Therefore, when we directly change a state, the new value will not be reflected on the screen. This is because React only fires a new render when a state is changed via the `setState` method related to that state.
+
+Wrong form:
+
+```tsx
+const Component = () => {
+  let [counter, setCounter] = useState(0)
+
+  return (
+    <>
+      <p>{counter}</p>
+      <button onClick={() => counter++}>Add</button>
+    </>
+  )
+}
+```
+
+If we add a `console.log`, we can see that the value has changed. However, this change will not be reflected on the screen. For this to happen, we need to use the `setState` method:
+
+```tsx
+const Component = () => {
+  const [counter, setCounter] = useState(0)
+
+  return (
+    <>
+      <p>{counter}</p>
+      <button onClick={() => setCounter(counter + 1)}>Add</button>
+    </>
+  )
+}
+```
+
+## Create render loop
+
+Another common mistake is to create a loop of renderings by changing a state and including that state in the `useEffect` dependency array.
+
+Example:
+
+```tsx
+const Component = () => {
+  const [counter, setCounter] = useState(0)
+
+  useEffect(() => {
+    setInterval(() => {
+      setCounter(counter + 1)
+    }, 1000)
+  }, [counter])
+
+  return (
+    <>
+      <p>{counter}</p>
+      <hr />
+    </>
+  )
+}
+```
+
+If you watch or add a log, you will notice that this code starts to create several `interval's. As a result, the numbers displayed on the screen become inconsistent, and after a while the application starts crashing. This is because the multiple `interval's' created become heavy and consume a lot of memory, eventually leading to a crash.
+
+We can pass a function to `setState` and have access to the current state as a parameter. Here is the correct example:
+
+```tsx
+const Component = () => {
+  const [counter, setCounter] = useState(0)
+
+  useEffect(() => {
+    setInterval(() => {
+      setCounter((state) => state + 1)
+    }, 1000)
+  }, [])
+
+  return (
+    <>
+      <p>{counter}</p>
+      <hr />
+    </>
+  )
+}
+```
+
+Note: If you are using [React 18 in Strict Mode](https://react.dev/blog/2022/03/08/react-18-upgrade-guide#updates-to-strict-mode), two intervals will be created by adding two by two, but with that we can get to the next error.
+
+## Create listeners and not remove them
+
+At some points, we need to create a [`listener`](https://developer.mozilla.org/pt-BR/docs/Web/API/EventTarget/addEventListener) for various reasons, or even a range that will execute code at regular intervals. The error occurs when we create these `listeners` and do not remove them at at some point. This causes the `listener` to continue running in the background, causing a memory leak and unexpected behavior in the application.
+
+The previous example is a case in point, because when using React 18 in Strict Mode, two ranges were created when we actually wanted only one. To to solve this problem, we just return a function inside `useEffect` that will clear this range.
+
+```tsx
+const Component = () => {
+  const [counter, setCounter] = useState(0)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCounter((state) => state + 1)
+    }, 1000)
+    return () => {
+      clearInterval(interval)
+    }
+  }, [])
+
+  return (
+    <>
+      <p>{counter}</p>
+      <hr />
+    </>
+  )
+}
+```
+
+## Accessing a state after updating it
+
+This is perhaps the most common mistake: when we update a state using `setState`, there is an asynchronous process for the value to be updated (it is not a promise). So when we try to access the state immediately after the atualização, o valor utilizado será o valor atual e não o novo valor que ainda será inserido no estado.
+
+Example:
+
+```tsx
+const Component = () => {
+  const [counter, setCounter] = useState(0)
+
+  const handleAdd = () => {
+    setCounter(counter + 1)
+    console.log(counter) // will show the current value before adding + 1
+  }
+
+  return (
+    <>
+      <p>{counter}</p>
+      <button onClick={handleAdd}>Add</button>
+    </>
+  )
+}
+```
+
+There are a few ways to solve this problem. The simplest way, probably in this case of clicking, is to create a variable with the new value before using it in the `setState` and in the log. In other cases, you can add a `useEffect` with the log and state in the dependency array, or even put the log directly into the body of the component, so that it is executed whenever the component renders. (the example is of a log, but could be a function that needs the new value)
+
+```tsx
+const Component = () => {
+  const [counter, setCounter] = useState(0)
+
+  const handleAdd = () => {
+    const newValue = counter + 1
+    setCounter(newValue)
+    // as it is one click we can do it this way
+    console.log(newValue)
+  }
+
+  useEffect(() => {
+    // if it is a function it is interesting to keep in the effect
+    console.log(counter)
+  }, [counter])
+
+  // if it is a log we can use it directly in the component
+  console.log(counter)
+
+  return (
+    <>
+      <p>{counter}</p>
+      <button onClick={handleAdd}>Add</button>
+      <hr />
+    </>
+  )
+}
+```
+
+## Do not use the prop key in lists
+
+To create lists of elements in React, we generally use the array `map` function to map the list and return JSX elements. If we don't add the `key` property, React will issue a warning indicating that each child in a list must have a unique key. What are the problems with not adding this unique key? The first problem is that the performance of lists will be compromised, because React will not be sure how to render each element efficiently. Also, the lack of unique keys can result in unexpected effects when the list is dynamic. And in the case of dynamic lists, adding the array index will continue to cause problems, as a list value can occupy an index where another value existed.
+
+Example:
+
+```tsx
+const Component = () => {
+  const [fruits, setFruits] = useState([
+    'orange',
+    'apple',
+    'watermelon',
+    'banana',
+    'melon',
+    'pineapple',
+  ])
+  return (
+    <div>
+      {fruits.map((fruit) => (
+        <div>
+          <button onClick={() => setFruits(fruits.filter((f) => f !== fruit))}>
+            Remove
+          </button>
+          <label htmlFor={fruit}>{fruit}</label>
+          <input id={fruit} defaultValue={fruit} />
+          <hr />
+        </div>
+      ))}
+    </div>
+  )
+}
+```
+
+In this example, when removing an element, we see that the associated input retains the value of the removed item, which causes problems in referencing the list. To to solve this problem, it is quite simple: we add the `key` property with a unique value. In this case, since the list has no repeated values we can use the name of the fruit itself as the key. However, in other cases it is more common to use a specific id associated with each object in the array.
+
+```tsx
+const Component = () => {
+  const [fruits, setFruits] = useState([
+    'orange',
+    'apple',
+    'watermelon',
+    'banana',
+    'melon',
+    'pineapple',
+  ])
+  return (
+    <div>
+      {fruits.map((fruit) => (
+        <div key={fruit}>
+          <button onClick={() => setFruits(fruits.filter((f) => f !== fruit))}>
+            Remove
+          </button>
+          <label htmlFor={fruit}>{fruit}</label>
+          <input id={fruit} defaultValue={fruit} />
+          <hr />
+        </div>
+      ))}
+    </div>
+  )
+}
+```
+
+## Conclusion and tips
+
+There are many other errors that could be addressed, but this post would become too long and could too long and could become a comprehensive documentation on common common errors in using React. Even so, I may not be able to mention all possible errors, so it is important to do detailed research, read other articles research, read other articles, and even ask questions to ChatGPT if you you are facing some specific error.
+
+Some reading tips:
+
+- [Codesandbox with the running examples](https://codesandbox.io/s/react-errors-2hxk9z?file=/src/App.js)
+- [The new React documentation has several sessions that minimize errors](https://react.dev/)
+- [A more detailed article on prop `key` only](https://kentcdodds.com/blog/understanding-reacts-key-prop)

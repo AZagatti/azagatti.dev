@@ -21,10 +21,13 @@
     @apply text-gray-800 dark:text-gray-200;
   }
   hr {
-    @apply my-8 w-full dark:opacity-30;
+    @apply w-full dark:opacity-30;
   }
   iframe {
     @apply h-[500px] rounded overflow-hidden w-full border-0;
+  }
+  .markdown hr {
+    @apply my-8;
   }
   .markdown img {
     @apply w-full h-auto object-cover block;

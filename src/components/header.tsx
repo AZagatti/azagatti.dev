@@ -20,7 +20,7 @@ export const Header = ({ children }: PropsWithChildren) => {
           <div className="flex">{children}</div>
         </nav>
       </div>
-      <hr />
+      <hr className="my-8" />
     </>
   )
 }

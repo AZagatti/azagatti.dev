@@ -9,7 +9,7 @@ export const Footer = () => {
 
   return (
     <>
-      <hr />
+      <hr className="my-8" />
       <div className="w-full flex items-center justify-center">
         <div className="md:max-w-6xl px-4 xl:px-0 flex-1">
           <div className="flex gap-8 justify-between flex-col md:flex-row">

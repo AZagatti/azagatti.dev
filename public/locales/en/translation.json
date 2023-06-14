@@ -6,7 +6,9 @@
     "aria": {
       "github": "Check my Github",
       "linkedin": "Check my Linkedin",
-      "twitter": "Check my Twitter"
+      "twitter": "Check my Twitter",
+      "instagram": "Check my Youtube",
+      "youtube": "Check my Youtube"
     }
   },
   "theme-button": {

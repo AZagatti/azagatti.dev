@@ -1,0 +1,478 @@
+---
+title: Patterns avançados com React
+pubDate: '2023-06-16T03:00:00Z'
+description: 'Alguns patterns avançados com exemplos para utilizar no React.'
+tags: [javascript, react, pattern]
+keywords: [javascript, react, pattern]
+heroImage: '/img/react-advanced-patterns.jpeg'
+---
+
+<img src="/img/react-advanced-patterns.jpeg" alt="Patterns avançados com React" />
+
+---
+
+Neste artigo, exploraremos padrões avançados com ReactJS, que permitem reutilizar
+código e simplificar a estrutura de projetos. Faremos uso dos recursos oferecidos
+pelo JavaScript e pelo React, como funções, componentes, propriedades e estados.
+Ao aplicar esses padrões, poderemos melhorar a eficiência e a organização do nosso
+código. Através de exemplos práticos, irei apresentar alguns desses padrões,
+demonstrando sua aplicação e benefícios.
+
+## Render Props
+
+O padrão Render Props é uma técnica muito útil no React que permite compartilhar
+lógica entre componentes, sem a necessidade de fazer o
+[lifting state up](https://react.dev/learn/sharing-state-between-components#lifting-state-up-by-example).
+Em vez disso, podemos aproveitar as propriedades especiais do React para passar
+funções como propriedades para os componentes, permitindo que eles compartilhem
+dados e comportamentos.
+
+A ideia básica por trás do padrão Render Props é que um componente pode aceitar
+uma função como propriedade e chamá-la para renderizar seu conteúdo interno.
+Dessa forma, o componente pai pode controlar o que é renderizado pelo componente
+filho, enquanto o filho tem acesso aos dados e funcionalidades necessárias.
+
+Exemplo:
+
+```jsx
+const RenderPropsParent = ({ render }) => {
+  const [counter, setCounter] = useState(0)
+
+  const increment = () => {
+    setCounter((state) => state + 1)
+  }
+
+  const decrement = () => {
+    setCounter((state) => state - 1)
+  }
+
+  return <div>{render({ counter, increment, decrement })}</div>
+}
+
+const RenderPropsChild = ({ counter, increment, decrement }) => {
+  return (
+    <div>
+      <button onClick={increment}>Increment</button>
+      <p>{counter}</p>
+      <button onClick={decrement}>Decrement</button>
+    </div>
+  )
+}
+
+const App = () => {
+  return (
+    <RenderPropsParent render={(props) => <RenderPropsChild {...props} />} />
+  )
+}
+```
+
+## Custom Hooks
+
+Os hooks são, essencialmente, funções que podem utilizar outros hooks e são
+utilizados dentro de componentes do React. Um Custom Hook, por sua vez, é um hook
+que utiliza outros hooks e tem como propósito abstrair a lógica de componentes.
+
+No exemplo mencionado anteriormente, utilizamos o padrão Render Props para manter
+o estado em um componente superior e utilizá-lo no componente dentro da Render
+Prop. No entanto, é possível isolar essa lógica em um Custom Hook e utilizá-lo
+apenas no componente filho.
+
+```jsx
+const useCounter = () => {
+  const [counter, setCounter] = useState(0)
+
+  const increment = () => {
+    setCounter((state) => state + 1)
+  }
+
+  const decrement = () => {
+    setCounter((state) => state - 1)
+  }
+
+  return { counter, increment, decrement }
+}
+
+const CustomHookChild = () => {
+  const { counter, increment, decrement } = useCounter()
+  return (
+    <div>
+      <button onClick={increment}>Increment</button>
+      <p>{counter}</p>
+      <button onClick={decrement}>Decrement</button>
+    </div>
+  )
+}
+```
+
+## Props Getters
+
+O padrão Props Getters é outro padrão interessante no React que permite manipular
+as propriedades de um componente antes de renderizá-lo. Com o Props Getters,
+podemos adicionar, modificar ou remover propriedades antes de passá-las para um
+componente filho.
+
+Nesse primeiro exemplo podemos utilizar o Props Getters junto com o Render Props:
+
+```jsx
+const PropsGettersParent = ({ render }) => {
+  const [counter, setCounter] = useState(0)
+
+  const increment = () => {
+    setCounter((state) => state + 1)
+  }
+
+  const decrement = () => {
+    setCounter((state) => state - 1)
+  }
+
+  const getButtonProps = ({ kind, ...props } = {}) => {
+    return {
+      className: 'button',
+      type: 'button',
+      ...props,
+      onClick: kind === 'increment' ? increment : decrement,
+    }
+  }
+
+  return <div>{render({ counter, getButtonProps })}</div>
+}
+
+const PropsGettersChildren = ({ counter, getButtonProps }) => {
+  return (
+    <div>
+      <button {...getButtonProps({ kind: 'increment' })}>Increment</button>
+      <p>Counter: {counter}</p>
+      <button {...getButtonProps({ kind: 'decrement' })}>Decrement</button>
+    </div>
+  )
+}
+
+const App = () => {
+  return (
+    <PropsGettersParent
+      render={(props) => <PropsGettersChildren {...props} />}
+    />
+  )
+}
+```
+
+Nesse exemplo, podemos observar que definimos inicialmente algumas propriedades
+padrão que serão passadas para os nossos botões por meio da função `getButtonProps`.
+No entanto, o interessante é que temos a flexibilidade de sobrescrever as
+propriedades conforme necessário (nesse caso exceto pelo `onClick`, que é uma
+regra de negócio). Isso nos permite personalizar cada botão de acordo com as
+nossas necessidades específicas.
+
+Mas não precisamos utilizar o padrão Render Props. Uma abordagem mais moderna é
+criar um Custom Hook e mover a lógica do componente pai para esse Hook.
+
+```jsx
+const useCounterProps = () => {
+  const [counter, setCounter] = useState(0)
+
+  const increment = () => {
+    setCounter((state) => state + 1)
+  }
+
+  const decrement = () => {
+    setCounter((state) => state - 1)
+  }
+
+  const getButtonProps = ({ kind, ...props } = {}) => {
+    return {
+      className: 'button',
+      type: 'button',
+      ...props,
+      onClick: kind === 'increment' ? increment : decrement,
+    }
+  }
+
+  return { counter, getButtonProps }
+}
+
+const PropsGettersChildrenHook = () => {
+  const { counter, getButtonProps } = useCounterProps()
+  return (
+    <div>
+      <button {...getButtonProps({ kind: 'increment' })}>Increment</button>
+      <p>Counter: {counter}</p>
+      <button {...getButtonProps({ kind: 'decrement' })}>Decrement</button>
+    </div>
+  )
+}
+
+const App = () => {
+  return <PropsGettersChildrenHook />
+}
+```
+
+Dessa forma, não precisamos utilizar o padrão Render Props. Isolamos a lógica em
+uma função com o hook e utilizamos apenas o componente.
+
+## High Order Components
+
+High Order Components (HOC) são funções que recebem um componente como argumento
+e retornam um novo componente aprimorado. Essa abordagem é baseada nos conceitos
+das [High Order Functions](https://en.wikipedia.org/wiki/Higher-order_function)
+da programação funcional e do JavaScript.
+
+Assim como as High Order Functions, os High Order Components permitem a reutilização
+de lógica e aprimoramento de componentes de forma modular. Eles encapsulam
+funcionalidades comuns em um componente e o retornam como um novo componente
+melhorado.
+
+```jsx
+const withCounter = (WrappedComponent) => {
+  const EnhancedComponent = (...props) => {
+    const [counter, setCounter] = useState(0)
+
+    const increment = () => {
+      setCounter((state) => state + 1)
+    }
+
+    const decrement = () => {
+      setCounter((state) => state - 1)
+    }
+
+    return (
+      <WrappedComponent
+        counter={counter}
+        increment={increment}
+        decrement={decrement}
+        {...props}
+      />
+    )
+  }
+
+  return EnhancedComponent
+}
+
+const Counter = ({ counter, increment, decrement }) => {
+  return (
+    <div>
+      <button onClick={increment}>Increment</button>
+      <p>Counter: {counter}</p>
+      <button onClick={decrement}>Decrement</button>
+    </div>
+  )
+}
+
+const CounterWithEnhancement = withCounter(Counter)
+
+const App = () => {
+  return <CounterWithEnhancement />
+}
+```
+
+## Compound Components
+
+O padrão de Compound Components é uma abordagem utilizada no desenvolvimento de
+componentes em React que permite agrupar diversos componentes relacionados em um
+único componente pai, chamado de Compound Component.
+
+Ao utilizar esse padrão, os componentes filhos são projetados para trabalharem
+em conjunto e compartilharem informações através do componente pai. Cada
+componente filho representa uma parte específica do comportamento ou visualização
+do Compound Component.
+
+O Compound Component fornece a estrutura e a lógica necessárias para coordenar
+e controlar os componentes filhos, enquanto os componentes filhos são projetados
+para serem flexíveis e reutilizáveis, com suas próprias responsabilidades bem
+definidas.
+
+Essa abordagem permite uma maior flexibilidade e personalização do componente
+composto, pois cada componente filho pode ser configurado de maneira independente,
+alterando seu comportamento, aparência ou estado.
+
+Um exemplo de tags nativas que seguem essa ideia é a tag `select` e `option`:
+
+```html
+<select>
+  <option value="dog">Dog</option>
+  <option value="cat">Cat</option>
+</select>
+```
+
+Se não utilizasse essa ideia de compor as tags seria algo do tipo:
+
+```html
+<select options="dog:Dog;cat:Cat"></select>
+```
+
+E no React conseguimos compor a interface da forma que desejarmos como nesse
+exemplo:
+
+```jsx
+const counterContext = createContext()
+const useCounterContext = () => useContext(counterContext)
+
+const Counter = ({ children }) => {
+  const [count, setCount] = useState(0)
+
+  const increment = () => {
+    setCount((state) => state + 1)
+  }
+
+  const decrement = () => {
+    setCount((state) => state - 1)
+  }
+
+  return (
+    <counterContext.Provider
+      value={{
+        count,
+        increment,
+        decrement,
+      }}
+    >
+      {children}
+    </counterContext.Provider>
+  )
+}
+
+const DisplayCount = () => {
+  const { count } = useCounterContext()
+  return <p>{count}</p>
+}
+
+const IncrementButton = () => {
+  const { increment } = useCounterContext()
+  return <button onClick={increment}>Increment</button>
+}
+
+const DecrementButton = () => {
+  const { decrement } = useCounterContext()
+  return <button onClick={decrement}>Decrement</button>
+}
+
+const App = () => {
+  return (
+    <Counter>
+      <DisplayCount />
+      <DecrementButton />
+      <IncrementButton />
+    </Counter>
+  )
+}
+```
+
+Uma outra forma bem comum é adicionar os componentes internos junto ao componente
+pai:
+
+```jsx
+Counter.Display = DisplayCount
+Counter.Increment = IncrementButton
+Counter.Decrement = DecrementButton
+
+<Counter>
+  <Counter.Display />
+  <Counter.Increment />
+  <Counter.Decrement />
+</Counter>
+```
+
+Uma das maiores vantagens é poder construir a interface com os componentes na
+ordem desejada. Podemos colocar o componente `Display` no topo ou no final, adicionar
+outro `Display` em qualquer lugar da interface ou até mesmo receber estilos diferentes
+como propriedades e aplicá-los apenas a um desses componentes. Como os componentes
+estão compartilhando o estado de um contexto, tudo fica compartilhado e isolado.
+
+A outra opção seria utilizar o `Children.map` e `cloneElement` do React, conforme
+mencionado
+[neste link](https://isamatov.com/compound-components-react/#older-approach). No
+entanto, com a Context API, o código fica mais legível, com a lógica isolada no
+contexto, tornando-se uma abordagem mais elegante.
+
+## State Reducer
+
+O padrão State Reducer é um padrão utilizado no desenvolvimento de aplicações em
+React para gerenciar o estado de um componente de forma mais flexível e extensível.
+Ele consiste em separar a lógica de atualização de estado em um objeto, que é
+responsável por receber a ação que ocorre no componente e determinar como o
+estado deve ser atualizado.
+
+O state reducer é uma função que recebe o estado atual e a ação como argumentos,
+e retorna o novo estado com base na ação. Ele permite modificar o estado de forma
+customizada, aplicando transformações ou validações adicionais antes de atualizá-lo.
+Esse padrão é especialmente útil quando o estado do componente possui lógica
+complexa ou quando é necessário aplicar lógica de negócio específica durante as
+atualizações de estado.
+
+```jsx
+const initialState = {
+  counter: 0,
+}
+
+const counterReducer = (state, action) => {
+  switch (action.type) {
+    case 'INCREMENT':
+      return {
+        ...state,
+        counter: state.counter + 1,
+      }
+    case 'DECREMENT':
+      return {
+        ...state,
+        counter: state.counter - 1,
+      }
+    default:
+      return state
+  }
+}
+
+const StateReducerCounter = () => {
+  const [state, dispatch] = useReducer(counterReducer, initialState)
+
+  const increment = () => {
+    dispatch({ type: 'INCREMENT' })
+  }
+
+  const decrement = () => {
+    dispatch({ type: 'DECREMENT' })
+  }
+
+  return (
+    <div>
+      <button onClick={increment}>Increment</button>
+      <p>{state.counter}</p>
+      <button onClick={decrement}>Decrement</button>
+    </div>
+  )
+}
+```
+
+Nesse exemplo, criamos um estado inicial `initialState` que contém a propriedade
+`counter` inicializada com 0. Em seguida, definimos um reducer `counterReducer` que
+recebe o estado atual e a ação, e retorna o novo estado com base na ação recebida.
+
+No componente `Counter`, utilizamos o hook `useReducer` para criar o estado e a função
+de `dispatch` associada ao reducer `counterReducer`. Ao chamar `dispatch` com a ação
+apropriada, o estado é atualizado de acordo com as regras definidas no reducer.
+
+Lembrando que esse padrão é muito útil quando lidamos com estados complexos.
+Podemos passar diversos valores juntamente com o `type` no `dispatch`, permitindo
+assim a alteração desses valores no `reducer`. Além disso, essa abordagem é conhecida
+por aqueles que utilizam ou já utilizaram o Redux.
+
+## Conclusão e referências.
+
+Exemplos rodando [nesse link](https://codesandbox.io/s/react-patterns-7958rv?file=/src/App.js).
+
+Não posso afirmar que existem muitos outros padrões a serem utilizados no React,
+levando em consideração essa lógica de abstração de código e composição de interfaces.
+Podemos considerar os modelos de renderização (Client Side, Server Side, etc.)
+como padrões, assim como alguns mencionados aqui. Além disso, você pode encontrar
+mais informações sobre esses padrões de renderização e muitos outros nesse
+[site de padrões](https://www.patterns.dev/posts).
+
+### Referências:
+- [patterns.dev](https://www.patterns.dev/posts)
+- [Nova doc do React](https://react.dev/)
+- [Compound Components - Kent C. Dodds](https://kentcdodds.com/blog/compound-components-with-react-hooks)
+
+### Algumas bibliotecas que utilizam esses padrões:
+- [Downshift](https://www.downshift-js.com/)
+- [MUI](https://mui.com/)
+- [Headless UI](https://headlessui.com/)
+- [TanStack Table](https://tanstack.com/table/v8)
+- [useHooks](https://usehooks.com/)

@@ -27,7 +27,7 @@ export const Footer = () => {
                     Se inscreva para novidades:
                   </h2>
                   <input
-                    className="mb-2 p-2 rounded-md border-[1px] border-gray-600 dark:border-gray-100 md:w-80"
+                    className="mb-2 p-2 rounded-md border-[1px] border-gray-600 dark:border-gray-100 w-full md:w-80"
                     type="email"
                     name="email"
                     id="email"

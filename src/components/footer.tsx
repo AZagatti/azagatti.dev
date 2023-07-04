@@ -34,6 +34,14 @@ export const Footer = () => {
                     placeholder="Email"
                     required
                   />
+                  <input
+                    className="mb-2 p-2 rounded-md border-[1px] border-gray-600 dark:border-gray-100 w-full md:w-80"
+                    type="text"
+                    name="first_name"
+                    id="first_name"
+                    placeholder="Primeiro nome"
+                    required
+                  />
                   <div klicksend-gdpr-text="">
                     <p className="text-xs">
                       Para mais informações, acesse:

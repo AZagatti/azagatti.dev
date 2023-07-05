@@ -19,6 +19,7 @@ export const Footer = () => {
             <div className="flex gap-8 justify-between flex-col md:flex-row mb-4">
               <div className="flex-1">
                 <form
+                  id="form"
                   klicksend-form-id="aauBz57"
                   method="post"
                   action="//handler.klicksend.com.br/subscription/aauBz57"
@@ -82,9 +83,12 @@ export const Footer = () => {
                       <input type="text" name="b_aauBz57" tabIndex={-1} />
                     </div>
                   </div>
-                  <button className="py-2 px-8 bg-gray-800 dark:bg-gray-100 rounded-md text-gray-200 dark:text-gray-900 hover:opacity-90 transition-opacity">
+                  <a
+                    id="submit"
+                    className="py-2 px-8 bg-gray-800 dark:bg-gray-100 rounded-md text-gray-200 dark:text-gray-900 hover:opacity-90 transition-opacity cursor-pointer"
+                  >
                     Enviar
-                  </button>
+                  </a>
                 </form>
               </div>
               <div className="flex-1 flex md:justify-end">

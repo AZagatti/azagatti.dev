@@ -1,0 +1,117 @@
+---
+title: Um pouco sobre React Server Components
+pubDate: '2023-08-14T03:00:00Z'
+description: 'Explicando sobre React Server Components e seu impacto.'
+tags: [javascript, react, server]
+keywords: [javascript, react, server]
+heroImage: '/img/react-server-components.jpeg'
+---
+
+<img src="/img/react-server-components.jpeg" alt="Um pouco sobre React Server Components" />
+
+---
+
+**React Server Components** é uma inovação no universo do React. Com ele, podemos
+desenvolver componentes que são inteiramente renderizados no servidor e enviados
+para o cliente em pedaços, usando o conceito de 'streaming'. Isso significa que
+o HTML chega ao cliente já completo, **eliminando a necessidade de a biblioteca
+React renderizar o componente**.
+
+Com isso, obtemos várias vantagens, uma vez que estamos enviando um HTML puro,
+eliminando a necessidade de o cliente carregar uma grande quantidade de JavaScript.
+Dessa forma, podemos **escolher componentes específicos que exigirão interação do
+cliente e renderizá-los lá**.
+
+## Mudança de como estruturamos nossos projetos
+
+Com os React Server Components, é necessário **repensar a estrutura dos nossos
+projetos em React**, considerando uma abordagem que maximize a renderização no
+servidor, enquanto os pequenos componentes que realmente requerem interação do
+cliente sejam tratados como 'client components'.
+
+Uma das vantagens dos RSCs é a inclusão das 'server actions', que nos permitem
+aproveitar as interações realizadas no cliente para **chamar funções no servidor**.
+Isso nos possibilita manter uma aplicação dinâmica, com a maior parte dos
+componentes sendo renderizados no servidor.
+
+## RSC não é igual a SSR
+
+**Os RSCs não funcionam da mesma forma que o Server Side Rendering (SSR).** No fluxo
+do SSR, um HTML pré-renderizado é enviado para o cliente e, em seguida, é
+realizado o processo de hidratação, incluindo o download do JavaScript necessário
+para esse componente. Isso ainda resulta em uma carga adicional durante a
+hidratação no cliente.
+
+Enquanto isso, com os RSCs, os componentes, como mencionado anteriormente, são
+transmitidos por meio de `streaming`. Assim, apenas o **HTML puro, já montado com a
+lógica presente no componente, é renderizado no servidor**.
+
+É importante destacar que, ao utilizarmos um framework como o Next.js, os
+'client components' mantêm o comportamento de SSR. Isso significa que podemos
+desfrutar dos benefícios de ambos os métodos no mesmo projeto.
+
+## Não existe bala de prata
+
+Claro, **os RSCs não resolvem todos os desafios inerentes ao React e suas estruturas**,
+porém certamente representam uma adição significativa à biblioteca que terá um
+impacto considerável em muitas aplicações.
+
+Do ponto de vista de desempenho, o SSR ainda enfrentava a questão da hidratação,
+que resultava no carregamento do JavaScript, tornando algumas aplicações
+substancialmente mais "pesadas". Com os RSCs, temos um `bundle` mínimo, o que é
+especialmente **vantajoso para aplicações destinadas a áreas com acesso limitado à
+internet**. Essa preocupação, por exemplo, tem sido um
+[esforço constante da equipe do Facebook ao longo dos anos](https://www.fiercewireless.com/wireless/facebook-open-sources-tool-to-let-developers-test-apps-2g-3g-and-lte-network-conditions).
+
+Além disso, em projetos de maior envergadura e complexidade, a minimização do
+código voltado apenas para o cliente é um benefício. Distribuir a responsabilidade
+do projeto entre o servidor e o cliente pode ser uma abordagem eficaz.
+
+Entretanto, é **importante destacar que os RSCs não são uma solução universal**.
+Para muitos projetos, uma Single Page Application (SPA) bem desenvolvida com Vite,
+por exemplo, pode ser mais do que suficiente. Nesse contexto, engenheiros de
+frontend precisam evoluir e adotar uma abordagem arquitetônica que atenda às
+necessidades específicas do projeto antes de selecionar a `stack` a ser utilizada,
+sem serem afetados apenas por hype.
+
+## RSC além do Next.js
+
+É importante ressaltar que o RSC é uma funcionalidade do React. Nesse contexto,
+o Next.js está liderando a implementação, visto que trabalha em colaboração com
+a equipe do React. No entanto, estão surgindo outras ferramentas que também são
+interessantes, especialmente para aqueles que desejam aprender e compreender o
+funcionamento dos RSC.
+
+Um exemplo que posso mencionar é o [`Waku`](https://github.com/dai-shi/waku) do
+Daishi. Daishi é conhecido por suas contribuições para o ecossistema React, como
+o `Zustand` e `Jotai`. Atualmente, ele está trabalhando neste framework minimalista
+que inclui integração com os RSC.
+
+Um ponto notável é o `README` do projeto, no qual ele detalhou toda a arquitetura
+do `Waku`, incluindo sua utilização dos RSC. Um exemplo visual dessa abordagem pode
+ser observado na imagem abaixo:
+
+![Waku architecture diagram](https://user-images.githubusercontent.com/490574/244907551-482c60ba-3a92-45ba-b7cc-9a077110ce44.png)
+
+[Fonte](https://excalidraw.com/#json=XGEA5V5JVU3AZSri7fXOw,Q95v26_30v05jwwQeU_tjw)
+
+## Conclusão
+
+Como engenheiros front-end, é fundamental acompanhar a evolução das novidades,
+pausar para **analisar nossos requisitos e planejar a solução com as ferramentas
+que melhor se adequam a cada caso**.
+
+Se estamos lidando com um projeto interno, sem a necessidade de otimização para
+motores de busca e outros fatores, uma Single Page Application (SPA) provavelmente
+é suficiente. Entretanto, se o projeto possui várias camadas e requer escalabilidade,
+é válido considerar as razões para optar pelo Next.js e RSC.
+
+Além disso, há outros frameworks excelentes disponíveis, como o Remix para
+aplicações fullstack com React e o Astro para projetos de conteúdo estático.
+Portanto, é importante não se limitar a apenas uma ferramenta e fazer uma pesquisa
+criteriosa antes de tomar qualquer decisão.
+
+### Links:
+
+- [Understanding React Server Components](https://vercel.com/blog/understanding-react-server-components)
+- [Waku](https://github.com/dai-shi/waku)

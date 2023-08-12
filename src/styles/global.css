@@ -18,7 +18,7 @@
   p,
   a,
   li {
-    @apply text-gray-800 dark:text-gray-200;
+    @apply text-gray-800 dark:text-gray-300;
   }
   hr {
     @apply w-full dark:opacity-30;
@@ -48,7 +48,7 @@
     @apply mb-4;
   }
   .markdown a {
-    @apply underline dark:text-gray-200 text-gray-900;
+    @apply underline dark:text-gray-100 text-gray-900;
   }
   .markdown h1,
   .markdown h2,
@@ -67,5 +67,8 @@
   }
   .markdown img + p {
     @apply mt-4;
+  }
+  .markdown strong {
+    @apply dark:text-gray-50;
   }
 }

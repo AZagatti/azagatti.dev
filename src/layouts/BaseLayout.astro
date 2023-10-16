@@ -8,13 +8,14 @@ import { Footer } from '../components/footer'
 import { Header } from '../components/header'
 import { ToggleThemeBtn } from '../components/toggle-theme-btn'
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts'
+import { ViewTransitions } from 'astro:transitions'
 
 export interface Props {
   title: string
-  description: string
+  description?: string
   image?: string
-  isPost: boolean
-  publishedTime: Date
+  isPost?: boolean
+  publishedTime?: Date
 }
 
 const {
@@ -35,6 +36,7 @@ const {
       isPost={isPost}
       publishedTime={publishedTime}
     />
+    <ViewTransitions />
   </head>
 
   <body>

@@ -1,6 +1,4 @@
-import type { AstroI18nextConfig } from 'astro-i18next'
-
-const config: AstroI18nextConfig = {
+const config = {
   defaultLocale: 'pt',
   locales: ['pt', 'en'],
   load: ['server', 'client'],

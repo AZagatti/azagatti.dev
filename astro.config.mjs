@@ -36,6 +36,11 @@ export default defineConfig({
   integrations: [mdx(), sitemap(), react(), tailwind(), astroI18next()],
   output: 'static',
   adapter: vercel({
-    analytics: true,
+    webAnalytics: {
+      enabled: true,
+    },
+    speedInsights: {
+      enabled: true,
+    },
   }),
 })

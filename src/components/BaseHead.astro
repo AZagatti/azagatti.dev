@@ -8,7 +8,7 @@ export interface Props {
   description: string
   image?: string
   isPost: boolean
-  publishedTime: Date
+  publishedTime?: Date
 }
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site)
@@ -127,28 +127,8 @@ const pubTime = publishedTime?.toISOString()
   }
 </script>
 
-<script is:inline>
-  const Themes = {
-    Dark: 'dark',
-    Light: 'light',
-  }
-  const storageKey = 'azagatti:theme'
-
-  const theme = (() => {
-    if (
-      typeof localStorage !== 'undefined' &&
-      localStorage.getItem(storageKey)
-    ) {
-      return localStorage.getItem(storageKey)
-    }
-    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      return Themes.Dark
-    }
-    return Themes.Light
-  })()
-  if (theme === Themes.Light) {
-    document.documentElement.classList.remove(Themes.Dark)
-  } else {
-    document.documentElement.classList.add(Themes.Dark)
-  }
+<script>
+  import { setTheme } from "../utils/setTheme";
+  setTheme()
+  document.addEventListener('astro:after-swap', setTheme);
 </script>

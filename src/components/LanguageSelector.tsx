@@ -47,6 +47,7 @@ export const LanguageSelector = ({ currentLocale }: LanguageSelectorProps) => {
           <a
             href={getRedirectUrl()}
             className="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-50"
+            data-astro-reload
           >
             <otherLanguage.flag className="w-6 h-6" />
             <span>{otherLanguage.name}</span>

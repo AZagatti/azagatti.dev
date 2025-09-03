@@ -1,28 +1,18 @@
 ---
 import { getCollection } from 'astro:content'
-import i18next, { changeLanguage } from 'i18next'
 import { ArticlesList } from '../../components/articles-list'
 import BaseLayout from '../../layouts/BaseLayout.astro'
 
 export function getStaticPaths() {
-  return i18next.languages.map((lang) => {
-    return {
-      params: {
-        blog: lang === 'pt' ? 'blog' : `${lang}/blog`,
-      },
-      props: {
-        lang,
-      },
-    }
-  })
+  return [
+    { params: { blog: undefined } },
+    { params: { blog: 'en/blog' } },
+  ]
 }
-
-const { lang } = Astro.props
-changeLanguage(lang)
 
 const collection = (
   await getCollection('blog', ({ id }) => {
-    return id.startsWith(`${lang}/`)
+    return id.startsWith(`${Astro.currentLocale}/`)
   })
 ).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
 const frontmatters = (
@@ -38,5 +28,8 @@ const posts = collection.map((post, index) => ({
 ---
 
 <BaseLayout title="André Zagatti Blog">
-  <ArticlesList articles={posts} />
+  <ArticlesList
+    articles={posts}
+    currentLocale={Astro.currentLocale as 'pt' | 'en'}
+  />
 </BaseLayout>

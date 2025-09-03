@@ -1,7 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content'
 import { getCollection } from 'astro:content'
-import { changeLanguage } from 'i18next'
 import { Post } from '../../components/post'
 import BaseLayout from '../../layouts/BaseLayout.astro'
 
@@ -11,21 +10,18 @@ export async function getStaticPaths() {
     const [lang, slug] = post.slug.split('/')
     return {
       params: {
-        blog: lang === 'pt' ? 'blog' : `${lang}/blog`,
+        blog: lang === 'pt' ? undefined : `${lang}/blog`,
         slug,
       },
-      props: { post, lang },
+      props: { post },
     }
   })
 }
 type Props = {
   post: CollectionEntry<'blog'>
-  lang: string
 }
-const { post, lang } = Astro.props
+const { post } = Astro.props
 const { Content, remarkPluginFrontmatter } = await post.render()
-
-changeLanguage(lang)
 ---
 
 <BaseLayout
@@ -37,6 +33,7 @@ changeLanguage(lang)
 >
   <Post
     post={{ ...post.data, minutesRead: remarkPluginFrontmatter.minutesRead }}
+    currentLocale={Astro.currentLocale as 'pt' | 'en'}
   >
     <Content />
   </Post>

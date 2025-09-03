@@ -7,6 +7,7 @@ import BaseHead from '../components/BaseHead.astro'
 import { Footer } from '../components/footer'
 import { Header } from '../components/header'
 import { ToggleThemeBtn } from '../components/toggle-theme-btn'
+import { LanguageSelector } from '../components/LanguageSelector'
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts'
 import { ViewTransitions } from 'astro:transitions'
 import enTranslations from '../../public/locales/en/translation.json'
@@ -66,6 +67,11 @@ const {
       publishedTime={publishedTime}
     />
     <ViewTransitions />
+    <script>
+      import { setTheme } from "../utils/setTheme";
+      setTheme()
+      document.addEventListener('astro:after-swap', setTheme);
+    </script>
   </head>
 
   <body>
@@ -73,6 +79,10 @@ const {
       class="w-full flex items-center justify-center flex-col bg-gray-100 dark:bg-gray-900"
     >
       <Header name={t.name} currentLocale={Astro.currentLocale ?? 'pt'}>
+        <LanguageSelector
+          client:load
+          currentLocale={Astro.currentLocale ?? 'pt'}
+        />
         <div class="min-w-[24px] min-h-[24px] ml-4">
           <ToggleThemeBtn
             client:idle

@@ -1,6 +1,4 @@
-"use client";
 import type { PropsWithChildren } from 'react'
-import { LanguageSelector } from './LanguageSelector'
 
 interface HeaderProps {
   name: string
@@ -26,10 +24,7 @@ export const Header = ({
               {name}
             </a>
           </h2>
-          <div className="flex items-center">
-            <LanguageSelector currentLocale={currentLocale} />
-            {children}
-          </div>
+          <div className="flex items-center">{children}</div>
         </nav>
       </div>
       <hr className="my-8" />

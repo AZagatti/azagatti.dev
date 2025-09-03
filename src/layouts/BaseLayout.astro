@@ -2,14 +2,13 @@
 import '@fontsource/nunito'
 import '@fontsource/roboto'
 import '../styles/global.css'
-import '../styles/tailwind.css'
 import BaseHead from '../components/BaseHead.astro'
 import { Footer } from '../components/footer'
 import { Header } from '../components/header'
 import { ToggleThemeBtn } from '../components/toggle-theme-btn'
 import { LanguageSelector } from '../components/LanguageSelector'
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts'
-import { ViewTransitions } from 'astro:transitions'
+import { ViewTransitions, ClientRouter } from 'astro:transitions'
 import enTranslations from '../../public/locales/en/translation.json'
 import ptTranslations from '../../public/locales/pt/translation.json'
 
@@ -57,7 +56,7 @@ const {
 } = Astro.props
 ---
 
-<html lang={Astro.currentLocale ?? 'pt'} data-astro-transition-persist>
+<html lang={Astro.currentLocale ?? 'pt'}>
   <head>
     <BaseHead
       title={title}
@@ -67,6 +66,7 @@ const {
       publishedTime={publishedTime}
     />
     <ViewTransitions />
+    <ClientRouter />
     <script>
       import { setTheme } from "../utils/setTheme";
       setTheme()

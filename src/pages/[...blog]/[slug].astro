@@ -10,7 +10,7 @@ export async function getStaticPaths() {
     const [lang, slug] = post.slug.split('/')
     return {
       params: {
-        blog: lang === 'pt' ? undefined : `${lang}/blog`,
+        blog: lang === 'pt' ? 'blog' : `${lang}/blog`,
         slug,
       },
       props: { post },

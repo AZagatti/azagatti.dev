@@ -36,7 +36,7 @@ export const LanguageSelector = ({ currentLocale }: LanguageSelectorProps) => {
     <div className="relative">
       <button
         type="button"
-        className="flex items-center gap-2"
+        className="flex items-center gap-2 text-gray-900 dark:text-gray-50"
         onClick={() => setIsOpen(!isOpen)}
       >
         <currentLanguage.flag className="w-6 h-6" />
@@ -46,7 +46,7 @@ export const LanguageSelector = ({ currentLocale }: LanguageSelectorProps) => {
         <div className="absolute top-full mt-2 w-40 bg-white dark:bg-gray-800 rounded-md shadow-lg">
           <a
             href={getRedirectUrl()}
-            className="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+            className="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-50"
           >
             <otherLanguage.flag className="w-6 h-6" />
             <span>{otherLanguage.name}</span>

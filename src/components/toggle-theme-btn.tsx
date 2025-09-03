@@ -33,11 +33,13 @@ export const ToggleThemeBtn = ({ ariaLabel }: ToggleThemeBtnProps) => {
   }, [])
 
   const toggleTheme = () => {
-    document.documentElement.classList.toggle(Themes.Dark)
-    const newTheme =
-      localStorage.getItem(storageKey) === Themes.Dark
-        ? Themes.Light
-        : Themes.Dark
+    const root = document.documentElement
+    const isDark = root.classList.contains(Themes.Dark)
+    const newTheme = isDark ? Themes.Light : Themes.Dark
+
+    root.classList.remove(isDark ? Themes.Dark : Themes.Light)
+    root.classList.add(newTheme)
+
     localStorage.setItem(storageKey, newTheme)
     setTheme(newTheme)
   }

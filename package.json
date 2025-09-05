@@ -22,7 +22,6 @@
     "@fontsource/roboto": "^5.2.6",
     "@tailwindcss/vite": "^4.1.12",
     "astro": "^5.13.5",
-    "astro-i18next": "1.0.0-beta.21",
     "country-flag-icons": "^1.5.19",
     "i18next": "^25.4.2",
     "mdast-util-to-string": "^4.0.0",

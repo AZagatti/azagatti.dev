@@ -8,7 +8,7 @@ import { Header } from '../components/header'
 import { ToggleThemeBtn } from '../components/toggle-theme-btn'
 import { LanguageSelector } from '../components/language-selector'
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts'
-import { ViewTransitions, ClientRouter } from 'astro:transitions'
+import { ClientRouter } from 'astro:transitions'
 import enTranslations from '../../public/locales/en/translation.json'
 import ptTranslations from '../../public/locales/pt/translation.json'
 
@@ -65,12 +65,11 @@ const {
       isPost={isPost}
       publishedTime={publishedTime}
     />
-    <ViewTransitions />
     <ClientRouter />
     <script>
-      import { setTheme } from "../utils/setTheme";
+      import { setTheme } from '../utils/setTheme'
       setTheme()
-      document.addEventListener('astro:after-swap', setTheme);
+      document.addEventListener('astro:after-swap', setTheme)
     </script>
   </head>
 

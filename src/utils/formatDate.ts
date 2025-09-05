@@ -1,5 +1,3 @@
-import i18next from 'i18next'
-
 const pt = {
   1: 'Janeiro',
   2: 'Fevereiro',
@@ -42,6 +40,7 @@ interface FormatReturnDateParams {
   month: keyof typeof pt
   year: number
   localeMonth: typeof pt
+  locale: Locale
 }
 
 const formatReturnDate = ({
@@ -49,8 +48,9 @@ const formatReturnDate = ({
   month,
   year,
   localeMonth,
+  locale,
 }: FormatReturnDateParams) => {
-  if (i18next.language === 'en') {
+  if (locale === 'en') {
     return `${localeMonth[month]} ${day}, ${year}`
   }
   return `${day} de ${localeMonth[month].toLowerCase()}, ${year}`
@@ -61,5 +61,5 @@ export const formatDate = (date: Date, locale: Locale) => {
   const month = (date.getMonth() + 1) as keyof typeof pt
   const year = date.getFullYear()
   const localeMonth = locales[locale]
-  return formatReturnDate({ day, month, year, localeMonth })
+  return formatReturnDate({ day, month, year, localeMonth, locale })
 }

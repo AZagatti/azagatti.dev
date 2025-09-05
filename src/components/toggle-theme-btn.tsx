@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import { Moon } from './icons/moon'
 import { Sun } from './icons/sun'
 
@@ -10,8 +9,11 @@ enum Themes {
 
 const storageKey = 'azagatti:theme'
 
-export const ToggleThemeBtn = () => {
-  const { t } = useTranslation()
+interface ToggleThemeBtnProps {
+  ariaLabel: string
+}
+
+export const ToggleThemeBtn = ({ ariaLabel }: ToggleThemeBtnProps) => {
   const [theme, setTheme] = useState<Themes>()
 
   useEffect(() => {
@@ -31,11 +33,13 @@ export const ToggleThemeBtn = () => {
   }, [])
 
   const toggleTheme = () => {
-    document.documentElement.classList.toggle(Themes.Dark)
-    const newTheme =
-      localStorage.getItem(storageKey) === Themes.Dark
-        ? Themes.Light
-        : Themes.Dark
+    const root = document.documentElement
+    const isDark = root.classList.contains(Themes.Dark)
+    const newTheme = isDark ? Themes.Light : Themes.Dark
+
+    root.classList.remove(isDark ? Themes.Dark : Themes.Light)
+    root.classList.add(newTheme)
+
     localStorage.setItem(storageKey, newTheme)
     setTheme(newTheme)
   }
@@ -52,7 +56,7 @@ export const ToggleThemeBtn = () => {
       type="button"
       className="bg-transparent border-none flex items-center justify-center "
       onClick={toggleTheme}
-      aria-label={t('theme-button.aria.button')!}
+      aria-label={ariaLabel}
     >
       {getIcon()}
     </button>

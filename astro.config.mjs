@@ -1,9 +1,8 @@
 import mdx from '@astrojs/mdx'
 import react from '@astrojs/react'
 import sitemap from '@astrojs/sitemap'
-import tailwind from '@astrojs/tailwind'
-import vercel from '@astrojs/vercel/static'
-import astroI18next from 'astro-i18next'
+import tailwindcss from '@tailwindcss/vite'
+import vercel from '@astrojs/vercel'
 import { defineConfig } from 'astro/config'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 import rehypeExternalLinks from 'rehype-external-links'
@@ -13,6 +12,10 @@ import { remarkReadingTime } from './src/utils/readingTime'
 // https://astro.build/config
 export default defineConfig({
   site: 'https://azagatti.dev',
+  i18n: {
+    defaultLocale: 'pt',
+    locales: ['pt', 'en'],
+  },
   markdown: {
     remarkPlugins: [remarkReadingTime],
     rehypePlugins: [
@@ -33,8 +36,11 @@ export default defineConfig({
     ],
     syntaxHighlight: 'prism',
   },
-  integrations: [mdx(), sitemap(), react(), tailwind(), astroI18next()],
+  integrations: [mdx(), sitemap(), react()],
   output: 'static',
+  vite: {
+    plugins: [tailwindcss()],
+  },
   adapter: vercel({
     webAnalytics: {
       enabled: true,

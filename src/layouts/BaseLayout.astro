@@ -1,14 +1,43 @@
 ---
 import '@fontsource/nunito'
 import '@fontsource/roboto'
-import i18next from 'i18next'
-import { LanguageSelector } from 'astro-i18next/components'
+import '../styles/global.css'
 import BaseHead from '../components/BaseHead.astro'
 import { Footer } from '../components/footer'
 import { Header } from '../components/header'
 import { ToggleThemeBtn } from '../components/toggle-theme-btn'
+import { LanguageSelector } from '../components/language-selector'
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts'
-import { ViewTransitions } from 'astro:transitions'
+import { ClientRouter } from 'astro:transitions'
+import enTranslations from '../../public/locales/en/translation.json'
+import ptTranslations from '../../public/locales/pt/translation.json'
+
+const translations = {
+  en: {
+    ...enTranslations,
+    'footer.description': enTranslations.footer.description,
+    'footer.year': enTranslations.footer.year,
+    'footer.aria.github': enTranslations.footer.aria.github,
+    'footer.aria.linkedin': enTranslations.footer.aria.linkedin,
+    'footer.aria.twitter': enTranslations.footer.aria.twitter,
+    'footer.aria.youtube': enTranslations.footer.aria.youtube,
+    'footer.aria.instagram': enTranslations.footer.aria.instagram,
+    'theme-button.aria.button': enTranslations['theme-button'].aria.button,
+  },
+  pt: {
+    ...ptTranslations,
+    'footer.description': ptTranslations.footer.description,
+    'footer.year': ptTranslations.footer.year,
+    'footer.aria.github': ptTranslations.footer.aria.github,
+    'footer.aria.linkedin': ptTranslations.footer.aria.linkedin,
+    'footer.aria.twitter': ptTranslations.footer.aria.twitter,
+    'footer.aria.youtube': ptTranslations.footer.aria.youtube,
+    'footer.aria.instagram': ptTranslations.footer.aria.instagram,
+    'theme-button.aria.button': ptTranslations['theme-button'].aria.button,
+  },
+}
+
+const t = translations[Astro.currentLocale ?? 'pt']
 
 export interface Props {
   title: string
@@ -27,7 +56,7 @@ const {
 } = Astro.props
 ---
 
-<html lang={i18next.language}>
+<html lang={Astro.currentLocale ?? 'pt'}>
   <head>
     <BaseHead
       title={title}
@@ -36,24 +65,32 @@ const {
       isPost={isPost}
       publishedTime={publishedTime}
     />
-    <ViewTransitions />
+    <ClientRouter />
+    <script>
+      import { setTheme } from '../utils/setTheme'
+      setTheme()
+      document.addEventListener('astro:after-swap', setTheme)
+    </script>
   </head>
 
   <body>
     <div
       class="w-full flex items-center justify-center flex-col bg-gray-100 dark:bg-gray-900"
     >
-      <Header>
+      <Header name={t.name} currentLocale={Astro.currentLocale ?? 'pt'}>
         <LanguageSelector
-          showFlag
-          class="text-gray-700 bg-gray-100 dark:text-gray-300 dark:bg-gray-900"
+          client:load
+          currentLocale={Astro.currentLocale ?? 'pt'}
         />
         <div class="min-w-[24px] min-h-[24px] ml-4">
-          <ToggleThemeBtn client:idle />
+          <ToggleThemeBtn
+            client:idle
+            ariaLabel={t['theme-button.aria.button']}
+          />
         </div>
       </Header>
       <slot />
-      <Footer />
+      <Footer translations={t} />
     </div>
   </body>
 </html>

@@ -7,8 +7,6 @@ enum Themes {
   Light = 'light',
 }
 
-const storageKey = 'azagatti:theme'
-
 interface ToggleThemeBtnProps {
   ariaLabel: string
 }
@@ -17,31 +15,24 @@ export const ToggleThemeBtn = ({ ariaLabel }: ToggleThemeBtnProps) => {
   const [theme, setTheme] = useState<Themes>()
 
   useEffect(() => {
-    setTheme(() => {
-      const darkTheme = window.matchMedia(
-        '(prefers-color-scheme: dark)'
-      ).matches
-      const stored = localStorage.getItem(storageKey) as Themes
-      if (stored) {
-        return stored
-      }
-      if (darkTheme) {
-        return Themes.Dark
-      }
-      return Themes.Light
+    const updateThemeState = () => {
+      const isDark = document.documentElement.classList.contains(Themes.Dark)
+      setTheme(isDark ? Themes.Dark : Themes.Light)
+    }
+
+    updateThemeState()
+
+    const observer = new MutationObserver(updateThemeState)
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
     })
+
+    return () => observer.disconnect()
   }, [])
 
-  const toggleTheme = () => {
-    const root = document.documentElement
-    const isDark = root.classList.contains(Themes.Dark)
-    const newTheme = isDark ? Themes.Light : Themes.Dark
-
-    root.classList.remove(isDark ? Themes.Dark : Themes.Light)
-    root.classList.add(newTheme)
-
-    localStorage.setItem(storageKey, newTheme)
-    setTheme(newTheme)
+  const handleToggleTheme = () => {
+    window.toggleTheme?.()
   }
 
   const getIcon = () => {
@@ -55,7 +46,7 @@ export const ToggleThemeBtn = ({ ariaLabel }: ToggleThemeBtnProps) => {
     <button
       type="button"
       className="bg-transparent border-none flex items-center justify-center "
-      onClick={toggleTheme}
+      onClick={handleToggleTheme}
       aria-label={ariaLabel}
     >
       {getIcon()}

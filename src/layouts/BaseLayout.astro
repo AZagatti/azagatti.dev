@@ -67,9 +67,9 @@ const {
     />
     <ClientRouter />
     <script>
-      import { setTheme } from '../utils/setTheme'
-      setTheme()
-      document.addEventListener('astro:after-swap', setTheme)
+      document.addEventListener('astro:after-swap', () => {
+        window.reapplyTheme?.()
+      })
     </script>
   </head>
 

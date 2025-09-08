@@ -10,3 +10,10 @@ declare module 'astro' {
     readonly currentLocale: SupportedLocale
   }
 }
+
+declare global {
+  interface Window {
+    toggleTheme?: () => void
+    reapplyTheme?: () => void
+  }
+}

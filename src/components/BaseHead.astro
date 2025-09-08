@@ -91,8 +91,41 @@ const pubTime = publishedTime?.toISOString()
   }
 </script>
 
-<script>
-  import { setTheme } from '../utils/setTheme'
-  setTheme()
-  document.addEventListener('astro:after-swap', setTheme)
+<script is:inline>
+  ;(function () {
+    const STORAGE_KEY = 'azagatti:theme'
+
+    function getInitialTheme() {
+      const stored = localStorage?.getItem(STORAGE_KEY)
+      if (stored === 'dark' || stored === 'light') return stored
+      return window.matchMedia?.('(prefers-color-scheme: dark)')?.matches
+        ? 'dark'
+        : 'light'
+    }
+
+    function applyTheme(theme) {
+      const isDark = theme === 'dark'
+      document.documentElement.classList.toggle('dark', isDark)
+      localStorage?.setItem(STORAGE_KEY, theme)
+    }
+
+    window.toggleTheme = function () {
+      const isDark = document.documentElement.classList.contains('dark')
+      applyTheme(isDark ? 'light' : 'dark')
+    }
+
+    window.reapplyTheme = function () {
+      applyTheme(getInitialTheme())
+    }
+
+    applyTheme(getInitialTheme())
+
+    window
+      .matchMedia?.('(prefers-color-scheme: dark)')
+      ?.addEventListener('change', (e) => {
+        if (!localStorage?.getItem(STORAGE_KEY)) {
+          applyTheme(e.matches ? 'dark' : 'light')
+        }
+      })
+  })()
 </script>

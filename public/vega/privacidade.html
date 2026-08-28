@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Vega — Política de privacidade</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { max-width: 42rem; margin: 3rem auto; padding: 0 1.25rem;
+         font: 1rem/1.6 system-ui, sans-serif; }
+  h1 { font-size: 1.6rem; } h2 { font-size: 1.1rem; margin-top: 2rem; }
+  code { font-size: .9em; } ul { padding-left: 1.2rem; }
+  footer { margin-top: 3rem; font-size: .9rem; opacity: .75; }
+</style>
+</head>
+<body>
+<h1>Política de privacidade do Vega</h1>
+
+<p>Vega é um assistente pessoal de uso individual. O único usuário é o autor, André Zagatti,
+e os únicos dados que o aplicativo acessa são os da conta Google dele.</p>
+
+<h2>Que dados o aplicativo acessa</h2>
+
+<ul>
+  <li><code>https://www.googleapis.com/auth/gmail.modify</code> — ler mensagens, pôr e tirar rótulos, arquivar, mandar,
+      responder e mandar para a lixeira. Não cobre apagar de vez, e o aplicativo não pede o
+      escopo que cobriria.</li>
+  <li><code>https://www.googleapis.com/auth/calendar.events</code> — ler, criar, alterar e apagar compromissos da agenda
+      principal.</li>
+  <li><code>https://www.googleapis.com/auth/drive</code> — procurar arquivos por nome e tipo, ler o conteúdo como texto,
+      criar um arquivo de texto e mandar um arquivo para a lixeira.</li>
+</ul>
+
+<h2>Para que</h2>
+
+<p>Para o autor conversar com o próprio e-mail, a própria agenda e os próprios arquivos por
+uma janela de chat. Nada é feito com esses dados fora desse uso.</p>
+
+<h2>Para onde os dados vão</h2>
+
+<p>O aplicativo roda na máquina do autor. As credenciais Google ficam nessa máquina, num
+arquivo de ambiente, e não são enviadas a lugar nenhum.</p>
+
+<p>O conteúdo que o aplicativo lê — o texto de uma mensagem, o título de um compromisso, o
+texto de um arquivo — é enviado ao modelo de linguagem que responde a conversa, porque é o
+modelo que redige a resposta. Hoje esse modelo é da OpenAI, com um modelo da Z.ai como
+alternativa quando a cota da OpenAI acaba, e um modelo da Anthropic quando o autor pede
+explicitamente uma segunda opinião. Nenhum outro terceiro recebe esses dados.</p>
+
+<p>Os dados não são vendidos, não alimentam publicidade, não são usados para criar perfil de
+ninguém e não são compartilhados com mais nenhum serviço ou pessoa.</p>
+
+<h2>O que fica guardado, e por quanto tempo</h2>
+
+<ul>
+  <li>As transcrições das conversas e os registros de uso ficam na máquina do autor, dentro
+      do diretório do aplicativo.</li>
+  <li>Um registro local das escritas feitas guarda um resumo criptográfico de cada operação
+      por 24 horas, para que uma tentativa repetida não mande o mesmo e-mail duas vezes. Ele
+      não guarda o conteúdo da mensagem.</li>
+  <li>O que o autor escolhe anotar vai para os arquivos markdown dele, na mesma máquina.</li>
+</ul>
+
+<p>Nada disso sai da máquina, e apagar o diretório do aplicativo apaga tudo.</p>
+
+<h2>Uso limitado</h2>
+
+<p>O uso que este aplicativo faz das informações recebidas das APIs do Google segue a
+<a href="https://developers.google.com/terms/api-services-user-data-policy">Política de dados
+do usuário dos Serviços de API do Google</a>, incluindo os requisitos de Uso Limitado.</p>
+
+<h2>Como revogar</h2>
+
+<p>O acesso é revogado em
+<a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a>, o que
+invalida a credencial na hora. Os dados locais somem quando o diretório do aplicativo é
+apagado.</p>
+
+<h2>Contato</h2>
+
+<p><a href="mailto:andre.zagatti1@gmail.com">andre.zagatti1@gmail.com</a></p>
+
+<footer><p><a href="./">Voltar</a> · <a href="termos.html">Termos de uso</a></p></footer>
+</body>
+</html>
